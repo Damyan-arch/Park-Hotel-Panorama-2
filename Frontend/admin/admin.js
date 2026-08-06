@@ -1,5 +1,8 @@
-const API_BASE = "http://localhost:3002/api";
-const MEDIA_BASE = "http://localhost:3002";
+// The backend serves this app's built files directly (see Backend/server.js),
+// and the Vite dev server proxies /api and /images to it (see vite.config.js) —
+// so relative paths work the same in dev and once shared behind a single tunnel link.
+const API_BASE = "/api";
+const MEDIA_BASE = "";
 const TOKEN_KEY = "php_admin_token";
 
 const ICON_SUGGESTIONS = [

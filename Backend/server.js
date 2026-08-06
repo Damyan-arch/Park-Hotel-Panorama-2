@@ -7,15 +7,41 @@ const multer = require("multer");
 const store = require("./data/store");
 
 const PORT = process.env.PORT || 3002;
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:4202";
+const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGIN || "http://localhost:4202")
+  .split(",")
+  .map((s) => s.trim())
+  .concat([`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`]);
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "damian.tsvetkov@hermeses.com").toLowerCase();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Lumen-Balkan-2179%";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 const app = express();
-app.use(cors({ origin: FRONTEND_ORIGIN }));
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true); // same-origin / non-browser requests
+      if (FRONTEND_ORIGINS.includes(origin)) return callback(null, true);
+      // Allow ad-hoc devtunnel preview links (e.g. sharing the site with a client)
+      // without needing to hardcode a random tunnel id in FRONTEND_ORIGIN.
+      try {
+        if (/\.devtunnels\.ms$/.test(new URL(origin).hostname)) return callback(null, true);
+      } catch {
+        // ignore malformed origin header
+      }
+      // Reject without throwing — an uncaught error here would 500 every
+      // request (including this server's own same-origin asset requests).
+      return callback(null, false);
+    }
+  })
+);
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "public/images")));
+
+// Serve the built frontend (Frontend/dist, produced by `npm run build`) from this
+// same server/port, so the whole site — including /admin — can be shared behind a
+// single tunnel link instead of forwarding the frontend and backend separately.
+const FRONTEND_DIST = path.join(__dirname, "../Frontend/dist");
+app.use(express.static(FRONTEND_DIST));
 
 const inquiries = [];
 const bookings = [];
