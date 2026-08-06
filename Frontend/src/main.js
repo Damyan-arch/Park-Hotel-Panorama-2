@@ -19,7 +19,7 @@ const LOCALE_MAP = { en: "en-US", bg: "bg-BG", de: "de-DE", es: "es-ES", ro: "ro
 const I18N = {
   en: {
     "nav.home": "Home", "nav.about": "About", "nav.rooms": "Rooms", "nav.restaurant": "Restaurant",
-    "nav.gallery": "Gallery", "nav.location": "Location", "nav.contact": "Contact",
+    "nav.gallery": "Gallery", "nav.location": "Location",
     "nav.callUs": "Call Us", "nav.bookNow": "Book Now",
     "hero.eyebrow": "Boutique Mountain Retreat · Tryavna",
     "hero.title": "The Best Way to Experience Bulgaria",
@@ -46,13 +46,8 @@ const I18N = {
     "location.eyebrow": "Location", "location.title": "Find us in Tryavna",
     "location.subtitle": "Tucked in the Balkan Mountains, close to the old town's craft workshops, museums and riverside walks.",
     "location.address": "Address", "location.phone": "Phone", "location.getDirections": "Get Directions",
-    "contact.eyebrow": "Contact", "contact.title": "We reply fast — usually within hours",
-    "contact.subtitle": "Reach out about a stay, a special request, or just to say hello.",
     "contact.phone": "Phone", "contact.address": "Address", "contact.followUs": "Follow us",
-    "contact.name": "Full name", "contact.email": "Email", "contact.phoneOptional": "Phone (optional)",
-    "contact.message": "Message", "contact.send": "Send Message", "contact.sending": "Sending...",
     "contact.errorGeneric": "Couldn't send right now — please call us instead.",
-    "contact.messagePlaceholder": "Tell us about your stay...",
     "booking.eyebrow": "Book Now", "booking.title": "Request Your Stay",
     "booking.subtitle": "Pick your dates, choose a room, and we'll confirm availability by phone or email.",
     "booking.checkIn": "Check-in", "booking.checkOut": "Check-out", "booking.selectDate": "Select a date",
@@ -70,7 +65,7 @@ const I18N = {
   },
   bg: {
     "nav.home": "Начало", "nav.about": "За нас", "nav.rooms": "Стаи", "nav.restaurant": "Ресторант",
-    "nav.gallery": "Галерия", "nav.location": "Локация", "nav.contact": "Контакти",
+    "nav.gallery": "Галерия", "nav.location": "Локация",
     "nav.callUs": "Обадете се", "nav.bookNow": "Резервирай",
     "hero.eyebrow": "Бутиков планински хотел · Трявна",
     "hero.title": "Най-добрият начин да опознаете България",
@@ -97,13 +92,8 @@ const I18N = {
     "location.eyebrow": "Локация", "location.title": "Намерете ни в Трявна",
     "location.subtitle": "Разположени в Балкана, близо до занаятчийските работилници, музеите и разходките край реката в стария град.",
     "location.address": "Адрес", "location.phone": "Телефон", "location.getDirections": "Вижте маршрут",
-    "contact.eyebrow": "Контакти", "contact.title": "Отговаряме бързо — обикновено до няколко часа",
-    "contact.subtitle": "Пишете ни за престой, специална заявка или просто за поздрав.",
     "contact.phone": "Телефон", "contact.address": "Адрес", "contact.followUs": "Последвайте ни",
-    "contact.name": "Име и фамилия", "contact.email": "Имейл", "contact.phoneOptional": "Телефон (по желание)",
-    "contact.message": "Съобщение", "contact.send": "Изпрати съобщение", "contact.sending": "Изпращане...",
     "contact.errorGeneric": "Не успяхме да изпратим съобщението — моля обадете се на посочения телефон.",
-    "contact.messagePlaceholder": "Разкажете ни за престоя си...",
     "booking.eyebrow": "Резервация", "booking.title": "Заявете престой",
     "booking.subtitle": "Изберете дати и стая — ще потвърдим наличността по телефон или имейл.",
     "booking.checkIn": "Настаняване", "booking.checkOut": "Напускане", "booking.selectDate": "Изберете дата",
@@ -121,7 +111,7 @@ const I18N = {
   },
   de: {
     "nav.home": "Startseite", "nav.about": "Über uns", "nav.rooms": "Zimmer", "nav.restaurant": "Restaurant",
-    "nav.gallery": "Galerie", "nav.location": "Lage", "nav.contact": "Kontakt",
+    "nav.gallery": "Galerie", "nav.location": "Lage",
     "nav.callUs": "Anrufen", "nav.bookNow": "Jetzt buchen",
     "hero.eyebrow": "Boutique-Berghotel · Tryavna",
     "hero.title": "Der beste Weg, Bulgarien zu erleben",
@@ -148,13 +138,8 @@ const I18N = {
     "location.eyebrow": "Lage", "location.title": "So finden Sie uns in Tryavna",
     "location.subtitle": "Im Balkangebirge gelegen, nahe den Handwerkswerkstätten, Museen und Flussspaziergängen der Altstadt.",
     "location.address": "Adresse", "location.phone": "Telefon", "location.getDirections": "Route anzeigen",
-    "contact.eyebrow": "Kontakt", "contact.title": "Wir antworten schnell — meist innerhalb von Stunden",
-    "contact.subtitle": "Kontaktieren Sie uns zu einem Aufenthalt, einem besonderen Wunsch oder einfach zum Hallosagen.",
     "contact.phone": "Telefon", "contact.address": "Adresse", "contact.followUs": "Folgen Sie uns",
-    "contact.name": "Vollständiger Name", "contact.email": "E-Mail", "contact.phoneOptional": "Telefon (optional)",
-    "contact.message": "Nachricht", "contact.send": "Nachricht senden", "contact.sending": "Wird gesendet...",
     "contact.errorGeneric": "Senden derzeit nicht möglich — bitte rufen Sie uns stattdessen an.",
-    "contact.messagePlaceholder": "Erzählen Sie uns von Ihrem Aufenthalt...",
     "booking.eyebrow": "Jetzt buchen", "booking.title": "Aufenthalt anfragen",
     "booking.subtitle": "Wählen Sie Ihre Daten und ein Zimmer — wir bestätigen die Verfügbarkeit per Telefon oder E-Mail.",
     "booking.checkIn": "Anreise", "booking.checkOut": "Abreise", "booking.selectDate": "Datum wählen",
@@ -172,7 +157,7 @@ const I18N = {
   },
   es: {
     "nav.home": "Inicio", "nav.about": "Sobre nosotros", "nav.rooms": "Habitaciones", "nav.restaurant": "Restaurante",
-    "nav.gallery": "Galería", "nav.location": "Ubicación", "nav.contact": "Contacto",
+    "nav.gallery": "Galería", "nav.location": "Ubicación",
     "nav.callUs": "Llámanos", "nav.bookNow": "Reservar",
     "hero.eyebrow": "Retiro de montaña boutique · Tryavna",
     "hero.title": "La mejor manera de vivir Bulgaria",
@@ -199,13 +184,8 @@ const I18N = {
     "location.eyebrow": "Ubicación", "location.title": "Encuéntrenos en Tryavna",
     "location.subtitle": "Ubicados en los Balcanes, cerca de los talleres artesanales, museos y paseos junto al río del casco antiguo.",
     "location.address": "Dirección", "location.phone": "Teléfono", "location.getDirections": "Cómo llegar",
-    "contact.eyebrow": "Contacto", "contact.title": "Respondemos rápido — normalmente en pocas horas",
-    "contact.subtitle": "Escríbanos sobre una estancia, una solicitud especial o simplemente para saludar.",
     "contact.phone": "Teléfono", "contact.address": "Dirección", "contact.followUs": "Síganos",
-    "contact.name": "Nombre completo", "contact.email": "Correo electrónico", "contact.phoneOptional": "Teléfono (opcional)",
-    "contact.message": "Mensaje", "contact.send": "Enviar mensaje", "contact.sending": "Enviando...",
     "contact.errorGeneric": "No pudimos enviarlo ahora — llámenos en su lugar.",
-    "contact.messagePlaceholder": "Cuéntenos sobre su estancia...",
     "booking.eyebrow": "Reservar", "booking.title": "Solicite su estancia",
     "booking.subtitle": "Elija sus fechas y una habitación — confirmaremos la disponibilidad por teléfono o correo.",
     "booking.checkIn": "Entrada", "booking.checkOut": "Salida", "booking.selectDate": "Seleccione una fecha",
@@ -223,7 +203,7 @@ const I18N = {
   },
   ro: {
     "nav.home": "Acasă", "nav.about": "Despre noi", "nav.rooms": "Camere", "nav.restaurant": "Restaurant",
-    "nav.gallery": "Galerie", "nav.location": "Locație", "nav.contact": "Contact",
+    "nav.gallery": "Galerie", "nav.location": "Locație",
     "nav.callUs": "Sună-ne", "nav.bookNow": "Rezervă acum",
     "hero.eyebrow": "Refugiu montan boutique · Tryavna",
     "hero.title": "Cel mai bun mod de a descoperi Bulgaria",
@@ -250,13 +230,8 @@ const I18N = {
     "location.eyebrow": "Locație", "location.title": "Găsiți-ne în Tryavna",
     "location.subtitle": "Situați în Munții Balcani, aproape de atelierele de artizanat, muzeele și plimbările de pe malul râului din orașul vechi.",
     "location.address": "Adresă", "location.phone": "Telefon", "location.getDirections": "Vezi traseul",
-    "contact.eyebrow": "Contact", "contact.title": "Răspundem rapid — de obicei în câteva ore",
-    "contact.subtitle": "Scrieți-ne despre o ședere, o cerere specială sau doar pentru a ne saluta.",
     "contact.phone": "Telefon", "contact.address": "Adresă", "contact.followUs": "Urmăriți-ne",
-    "contact.name": "Nume complet", "contact.email": "E-mail", "contact.phoneOptional": "Telefon (opțional)",
-    "contact.message": "Mesaj", "contact.send": "Trimite mesajul", "contact.sending": "Se trimite...",
     "contact.errorGeneric": "Nu am putut trimite acum — vă rugăm să ne sunați.",
-    "contact.messagePlaceholder": "Spuneți-ne despre șederea dumneavoastră...",
     "booking.eyebrow": "Rezervă acum", "booking.title": "Solicită șederea",
     "booking.subtitle": "Alegeți datele și o cameră — vom confirma disponibilitatea prin telefon sau e-mail.",
     "booking.checkIn": "Check-in", "booking.checkOut": "Check-out", "booking.selectDate": "Selectați o dată",
@@ -391,7 +366,6 @@ function renderShell() {
           <a href="#restaurant">${t("nav.restaurant")}</a>
           <a href="#gallery">${t("nav.gallery")}</a>
           <a href="#location">${t("nav.location")}</a>
-          <a href="#contact">${t("nav.contact")}</a>
         </nav>
         <div class="nav-actions">
           <a class="nav-call" href="tel:+359897820065">
@@ -564,62 +538,32 @@ function renderShell() {
         </div>
       </section>
 
-      <section class="contact" id="contact">
-        <div class="container">
-          <div class="contact-info">
-            <div class="section-head">
-              <div class="eyebrow">${t("contact.eyebrow")}</div>
-              <h2>${t("contact.title")}</h2>
-              <p>${t("contact.subtitle")}</p>
-            </div>
-            <div class="contact-card">
-              <div class="icon-badge"><span class="material-symbols-outlined">call</span></div>
-              <div><strong>${t("contact.phone")}</strong><a href="tel:+359897820065">${escapeHtml(state.settings.phoneNumber)}</a></div>
-            </div>
-            <div class="contact-card">
-              <div class="icon-badge"><span class="material-symbols-outlined">location_on</span></div>
-              <div><strong>${t("contact.address")}</strong><span>${escapeHtml(state.settings.address)}</span></div>
-            </div>
-            <div class="contact-card">
-              <div class="icon-badge"><span class="material-symbols-outlined">thumb_up</span></div>
-              <div><strong>${t("contact.followUs")}</strong><a href="${state.settings.facebookUrl}" target="_blank" rel="noopener">Facebook</a></div>
-            </div>
-          </div>
-          <form class="contact-form" id="contactForm">
-            <div class="form-row">
-              <div class="field">
-                <label for="name">${t("contact.name")}</label>
-                <input id="name" name="name" type="text" required placeholder="Jane Doe" />
-              </div>
-              <div class="field">
-                <label for="email">${t("contact.email")}</label>
-                <input id="email" name="email" type="email" required placeholder="jane@example.com" />
-              </div>
-            </div>
-            <div class="field">
-              <label for="phone">${t("contact.phoneOptional")}</label>
-              <input id="phone" name="phone" type="tel" placeholder="+359 ..." />
-            </div>
-            <div class="field">
-              <label for="message">${t("contact.message")}</label>
-              <textarea id="message" name="message" rows="4" required placeholder="${t("contact.messagePlaceholder")}"></textarea>
-            </div>
-            <button class="btn btn-gold" type="submit">
-              <span class="material-symbols-outlined">send</span> ${t("contact.send")}
-            </button>
-            <div class="form-status" id="formStatus"></div>
-          </form>
-        </div>
-      </section>
-
       <section class="booking" id="booking">
         <div class="container">
-          <div class="section-head">
-            <div class="eyebrow">${t("booking.eyebrow")}</div>
-            <h2>${t("booking.title")}</h2>
-            <p>${t("booking.subtitle")}</p>
+          <div class="booking-columns">
+            <div class="booking-intro">
+              <div class="section-head">
+                <div class="eyebrow">${t("booking.eyebrow")}</div>
+                <h2>${t("booking.title")}</h2>
+                <p>${t("booking.subtitle")}</p>
+              </div>
+              <div class="booking-contact-list">
+                <a class="booking-contact-item" href="${state.settings.phoneHref}" aria-label="${t("contact.phone")}">
+                  <span class="icon-badge"><span class="material-symbols-outlined">call</span></span>
+                  <span>${escapeHtml(state.settings.phoneNumber)}</span>
+                </a>
+                <a class="booking-contact-item" href="#location" aria-label="${t("contact.address")}">
+                  <span class="icon-badge"><span class="material-symbols-outlined">location_on</span></span>
+                  <span>${escapeHtml(state.settings.address)}</span>
+                </a>
+                <a class="booking-contact-item" href="${state.settings.facebookUrl}" target="_blank" rel="noopener" aria-label="${t("contact.followUs")}">
+                  <span class="icon-badge"><span class="material-symbols-outlined">thumb_up</span></span>
+                  <span>${t("contact.followUs")}</span>
+                </a>
+              </div>
+            </div>
+            <div id="bookingWidgetRoot"></div>
           </div>
-          <div id="bookingWidgetRoot"></div>
         </div>
       </section>
     </main>
@@ -809,6 +753,34 @@ function buildMonthMatrix(year, month) {
   return cells;
 }
 
+let roomSelectOutsideClickWired = false;
+
+function wireRoomSelect() {
+  const wrap = document.getElementById("roomSelect");
+  if (!wrap) return;
+  const toggle = document.getElementById("roomSelectToggle");
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle("open");
+  });
+
+  wrap.querySelectorAll("[data-room-id]").forEach((li) => {
+    li.addEventListener("click", () => {
+      state.booking.roomId = li.dataset.roomId;
+      renderBookingWidget();
+    });
+  });
+
+  if (!roomSelectOutsideClickWired) {
+    document.addEventListener("click", (e) => {
+      const current = document.getElementById("roomSelect");
+      if (current && !current.contains(e.target)) current.classList.remove("open");
+    });
+    roomSelectOutsideClickWired = true;
+  }
+}
+
 function renderBookingWidget() {
   const root = document.getElementById("bookingWidgetRoot");
   if (!root) return;
@@ -829,8 +801,13 @@ function renderBookingWidget() {
   });
 
   const isPrevDisabled = calendarMonth.getFullYear() === today.getFullYear() && calendarMonth.getMonth() === today.getMonth();
+  const selectedRoom = state.rooms.find((r) => r.id === roomId);
+  const roomLabel = selectedRoom
+    ? `${escapeHtml(selectedRoom.name)} — €${selectedRoom.basePricePerNight}${t("rooms.perNight")}`
+    : t("booking.selectRoom");
 
   root.innerHTML = `
+    <div class="booking-widget-row">
     <div class="booking-card">
       <div class="date-fields">
         <div class="date-field">
@@ -887,13 +864,21 @@ function renderBookingWidget() {
 
     <form class="contact-form booking-form" id="bookingForm">
       <div class="field">
-        <label for="bookingRoom">${t("booking.room")}</label>
-        <select id="bookingRoom" name="roomId" required>
-          <option value="" ${!roomId ? "selected" : ""} disabled>${t("booking.selectRoom")}</option>
-          ${state.rooms
-            .map((r) => `<option value="${r.id}" ${r.id === roomId ? "selected" : ""}>${escapeHtml(r.name)} — €${r.basePricePerNight}${t("rooms.perNight")}</option>`)
-            .join("")}
-        </select>
+        <label>${t("booking.room")}</label>
+        <div class="room-select" id="roomSelect">
+          <button type="button" class="room-select-toggle" id="roomSelectToggle" aria-haspopup="listbox">
+            <span class="${selectedRoom ? "" : "placeholder"}">${roomLabel}</span>
+            <span class="material-symbols-outlined caret">expand_more</span>
+          </button>
+          <ul class="room-select-menu" id="roomSelectMenu" role="listbox">
+            ${state.rooms
+              .map(
+                (r) =>
+                  `<li role="option" data-room-id="${r.id}" class="${r.id === roomId ? "active" : ""}">${escapeHtml(r.name)} — €${r.basePricePerNight}${t("rooms.perNight")}</li>`
+              )
+              .join("")}
+          </ul>
+        </div>
       </div>
       <div class="field">
         <label for="bookingName">${t("booking.fullName")}</label>
@@ -914,6 +899,7 @@ function renderBookingWidget() {
       </button>
       <div class="form-status" id="bookingStatus"></div>
     </form>
+    </div>
   `;
 
   document.getElementById("calPrev").addEventListener("click", () => {
@@ -946,9 +932,7 @@ function renderBookingWidget() {
     });
   });
 
-  document.getElementById("bookingRoom").addEventListener("change", (e) => {
-    state.booking.roomId = e.target.value;
-  });
+  wireRoomSelect();
 
   document.getElementById("bookingForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -971,6 +955,7 @@ function renderBookingWidget() {
 
     const form = e.target;
     const payload = Object.fromEntries(new FormData(form).entries());
+    payload.roomId = b.roomId;
     const room = state.rooms.find((r) => r.id === b.roomId);
 
     try {
@@ -1044,40 +1029,10 @@ function wireLangSwitch() {
   });
 }
 
-function wireContactForm() {
-  const form = document.getElementById("contactForm");
-  const status = document.getElementById("formStatus");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    status.textContent = t("contact.sending");
-    status.className = "form-status";
-
-    const payload = Object.fromEntries(new FormData(form).entries());
-
-    try {
-      const res = await fetch(`${API_BASE}/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong");
-      status.textContent = data.message;
-      status.className = "form-status success";
-      form.reset();
-    } catch (err) {
-      status.textContent = t("contact.errorGeneric");
-      status.className = "form-status error";
-    }
-  });
-}
-
 function renderAll() {
   renderShell();
   wireNav();
   wireLangSwitch();
-  wireContactForm();
   renderAmenities();
   renderRooms();
   renderGallery();
