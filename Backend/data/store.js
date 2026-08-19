@@ -74,6 +74,32 @@ module.exports = {
     return true;
   },
 
+  getEvents() {
+    return read().events;
+  },
+  addEvent(event) {
+    const db = read();
+    db.events.push(event);
+    write(db);
+    return event;
+  },
+  updateEvent(id, patch) {
+    const db = read();
+    const event = db.events.find((e) => e.id === id);
+    if (!event) return null;
+    Object.assign(event, patch);
+    write(db);
+    return event;
+  },
+  deleteEvent(id) {
+    const db = read();
+    const index = db.events.findIndex((e) => e.id === id);
+    if (index === -1) return false;
+    db.events.splice(index, 1);
+    write(db);
+    return true;
+  },
+
   getAmenities() {
     return read().amenities;
   },

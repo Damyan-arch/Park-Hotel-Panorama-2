@@ -122,6 +122,10 @@ app.get("/api/gallery", (_req, res) => {
   res.json([...store.getGallery()].sort((a, b) => a.sortOrder - b.sortOrder));
 });
 
+app.get("/api/events", (_req, res) => {
+  res.json([...store.getEvents()].sort((a, b) => new Date(a.date) - new Date(b.date)));
+});
+
 /* ---------- Public form submissions ---------- */
 
 app.post("/api/contact", (req, res) => {
@@ -359,6 +363,37 @@ app.put("/api/admin/amenities/:id", requireAdmin, (req, res) => {
 app.delete("/api/admin/amenities/:id", requireAdmin, (req, res) => {
   const removed = store.deleteAmenity(req.params.id);
   if (!removed) return res.status(404).json({ error: "Amenity not found." });
+  res.status(204).end();
+});
+
+/* ---------- Admin: events ---------- */
+
+app.post("/api/admin/events", requireAdmin, (req, res) => {
+  const { title, date, time, description, imageUrl, infoUrl } = req.body || {};
+  if (!title || !date) return res.status(400).json({ error: "Title and date are required." });
+
+  const event = {
+    id: crypto.randomUUID(),
+    title,
+    date,
+    time: time || "",
+    description: description || "",
+    imageUrl: imageUrl || "",
+    infoUrl: infoUrl || ""
+  };
+
+  res.status(201).json(store.addEvent(event));
+});
+
+app.put("/api/admin/events/:id", requireAdmin, (req, res) => {
+  const event = store.updateEvent(req.params.id, req.body || {});
+  if (!event) return res.status(404).json({ error: "Event not found." });
+  res.json(event);
+});
+
+app.delete("/api/admin/events/:id", requireAdmin, (req, res) => {
+  const removed = store.deleteEvent(req.params.id);
+  if (!removed) return res.status(404).json({ error: "Event not found." });
   res.status(204).end();
 });
 
