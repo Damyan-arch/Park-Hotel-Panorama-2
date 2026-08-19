@@ -309,6 +309,16 @@ function tOrSetting(key, settingValue) {
   return state.lang === "en" && settingValue ? settingValue : t(key);
 }
 
+// Admin-entered content (room/event/amenity names & descriptions) is stored
+// as { en, bg, de, es, ro } once DeepL translation is set up on the backend.
+// Falls back to English, then to whatever language is actually populated, so
+// content saved before translation was configured still displays correctly.
+function pickLocalized(value, lang) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  return value[lang] || value.en || Object.values(value).find(Boolean) || "";
+}
+
 async function fetchJSON(path, fallback) {
   try {
     const res = await fetch(`${API_BASE}${path}`);
@@ -643,9 +653,9 @@ function renderShell() {
                 .map(
                   (ev) => `
                 <div class="events-widget-item">
-                  ${ev.imageUrl ? `<img src="${mediaUrl(ev.imageUrl)}" alt="${escapeHtml(ev.title)}" />` : ""}
+                  ${ev.imageUrl ? `<img src="${mediaUrl(ev.imageUrl)}" alt="${escapeHtml(pickLocalized(ev.title, state.lang))}" />` : ""}
                   <div class="events-widget-item-text">
-                    <strong>${escapeHtml(ev.title)}</strong>
+                    <strong>${escapeHtml(pickLocalized(ev.title, state.lang))}</strong>
                     <span>${formatDateLabel(new Date(ev.date))}</span>
                   </div>
                 </div>`
@@ -676,8 +686,8 @@ function renderAmenities() {
       (a) => `
       <div class="amenity-card">
         <div class="icon-badge"><span class="material-symbols-outlined">${a.icon}</span></div>
-        <h3>${escapeHtml(a.title)}</h3>
-        <p>${escapeHtml(a.text)}</p>
+        <h3>${escapeHtml(pickLocalized(a.title, state.lang))}</h3>
+        <p>${escapeHtml(pickLocalized(a.text, state.lang))}</p>
       </div>`
     )
     .join("");
@@ -697,16 +707,16 @@ function renderRooms() {
           (r) => `
         <div class="room-card">
           <div class="room-media">
-            <img src="${mediaUrl(r.imageUrl)}" alt="${escapeHtml(r.name)}" loading="lazy" />
+            <img src="${mediaUrl(r.imageUrl)}" alt="${escapeHtml(pickLocalized(r.name, state.lang))}" loading="lazy" />
             <span class="room-tag">${escapeHtml(r.type)}</span>
           </div>
           <div class="room-body">
-            <h3>${escapeHtml(r.name)}</h3>
+            <h3>${escapeHtml(pickLocalized(r.name, state.lang))}</h3>
             <div class="room-meta">
               <span><span class="material-symbols-outlined">group</span> ${r.capacity} ${t("rooms.guests")}</span>
               <span><span class="material-symbols-outlined">straighten</span> ${r.sizeSqm} m²</span>
             </div>
-            <p class="room-desc">${escapeHtml(r.description || "")}</p>
+            <p class="room-desc">${escapeHtml(pickLocalized(r.description, state.lang))}</p>
             <div class="room-footer">
               <div class="room-price"><strong>€${r.basePricePerNight}</strong><span> ${t("rooms.perNight")}</span></div>
               <a class="btn btn-line" href="#booking" data-room-id="${r.id}">${t("rooms.inquire")}</a>
@@ -848,7 +858,7 @@ function renderBookingWidget() {
   const isPrevDisabled = calendarMonth.getFullYear() === today.getFullYear() && calendarMonth.getMonth() === today.getMonth();
   const selectedRoom = state.rooms.find((r) => r.id === roomId);
   const roomLabel = selectedRoom
-    ? `${escapeHtml(selectedRoom.name)} — €${selectedRoom.basePricePerNight}${t("rooms.perNight")}`
+    ? `${escapeHtml(pickLocalized(selectedRoom.name, state.lang))} — €${selectedRoom.basePricePerNight}${t("rooms.perNight")}`
     : t("booking.selectRoom");
 
   root.innerHTML = `
@@ -919,7 +929,7 @@ function renderBookingWidget() {
             ${state.rooms
               .map(
                 (r) =>
-                  `<li role="option" data-room-id="${r.id}" class="${r.id === roomId ? "active" : ""}">${escapeHtml(r.name)} — €${r.basePricePerNight}${t("rooms.perNight")}</li>`
+                  `<li role="option" data-room-id="${r.id}" class="${r.id === roomId ? "active" : ""}">${escapeHtml(pickLocalized(r.name, state.lang))} — €${r.basePricePerNight}${t("rooms.perNight")}</li>`
               )
               .join("")}
           </ul>
@@ -1009,7 +1019,7 @@ function renderBookingWidget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...payload,
-          roomName: room ? room.name : "",
+          roomName: room ? pickLocalized(room.name, state.lang) : "",
           checkIn: formatDate(b.checkIn),
           checkOut: formatDate(b.checkOut)
         })

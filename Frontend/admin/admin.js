@@ -5,6 +5,16 @@ const API_BASE = "/api";
 const MEDIA_BASE = "";
 const TOKEN_KEY = "php_admin_token";
 
+// Rooms/events/amenities are stored as { en, bg, de, es, ro } once DeepL
+// translation is set up on the backend. The admin form only ever shows/edits
+// one text box per field — English if present, otherwise whatever language
+// is populated (e.g. content saved before a DeepL key existed).
+function localizedForEdit(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  return value.en || Object.values(value).find(Boolean) || "";
+}
+
 const ICON_SUGGESTIONS = [
   "spa", "museum", "directions_bike", "restaurant", "wine_bar", "hiking",
   "pool", "local_bar", "terrain", "park", "hot_tub", "golf_course", "kayaking",
@@ -290,7 +300,8 @@ function roomFormFields(room = {}) {
     ${imagePickerHtml("roomImage", room.imageUrl)}
     <div class="field">
       <label for="roomName">Name</label>
-      <input id="roomName" value="${escapeHtml(room.name || "")}" required />
+      <input id="roomName" value="${escapeHtml(localizedForEdit(room.name))}" required />
+      <p class="field-hint">Saved automatically in all site languages via DeepL.</p>
     </div>
     <div class="form-row">
       <div class="field">
@@ -304,7 +315,7 @@ function roomFormFields(room = {}) {
     </div>
     <div class="field">
       <label for="roomDescription">Description</label>
-      <textarea id="roomDescription" rows="3">${escapeHtml(room.description || "")}</textarea>
+      <textarea id="roomDescription" rows="3">${escapeHtml(localizedForEdit(room.description))}</textarea>
     </div>
     <div class="form-row three">
       <div class="field">
@@ -377,9 +388,9 @@ function renderRoomsPanel() {
               .map(
                 (r) => `
               <div class="content-card">
-                <img class="content-thumb" src="${mediaUrl(r.imageUrl)}" alt="${escapeHtml(r.name)}" />
+                <img class="content-thumb" src="${mediaUrl(r.imageUrl)}" alt="${escapeHtml(localizedForEdit(r.name))}" />
                 <div class="content-body">
-                  <strong>${escapeHtml(r.name)}</strong>
+                  <strong>${escapeHtml(localizedForEdit(r.name))}</strong>
                   <span class="content-sub">${escapeHtml(r.type)} · ${r.capacity} guests · ${r.sizeSqm} m² · €${r.basePricePerNight}/night</span>
                 </div>
                 <div class="content-actions">
@@ -482,7 +493,8 @@ function eventFormFields(event = {}) {
     ${imagePickerHtml("eventImage", event.imageUrl)}
     <div class="field">
       <label for="eventTitle">Title</label>
-      <input id="eventTitle" value="${escapeHtml(event.title || "")}" required />
+      <input id="eventTitle" value="${escapeHtml(localizedForEdit(event.title))}" required />
+      <p class="field-hint">Saved automatically in all site languages via DeepL.</p>
     </div>
     <div class="form-row">
       <div class="field">
@@ -496,7 +508,7 @@ function eventFormFields(event = {}) {
     </div>
     <div class="field">
       <label for="eventDescription">Description</label>
-      <textarea id="eventDescription" rows="3">${escapeHtml(event.description || "")}</textarea>
+      <textarea id="eventDescription" rows="3">${escapeHtml(localizedForEdit(event.description))}</textarea>
     </div>
     <div class="field">
       <label for="eventInfoUrl">More information link (optional)</label>
@@ -562,9 +574,9 @@ function renderEventsPanel() {
               .map(
                 (e) => `
               <div class="content-card">
-                ${e.imageUrl ? `<img class="content-thumb" src="${mediaUrl(e.imageUrl)}" alt="${escapeHtml(e.title)}" />` : ""}
+                ${e.imageUrl ? `<img class="content-thumb" src="${mediaUrl(e.imageUrl)}" alt="${escapeHtml(localizedForEdit(e.title))}" />` : ""}
                 <div class="content-body">
-                  <strong>${escapeHtml(e.title)}</strong>
+                  <strong>${escapeHtml(localizedForEdit(e.title))}</strong>
                   <span class="content-sub">${formatEventDate(e.date)}${e.time ? ` · ${escapeHtml(e.time)}` : ""}</span>
                 </div>
                 <div class="content-actions">
@@ -597,11 +609,12 @@ function amenityFormFields(amenity = {}) {
     </div>
     <div class="field">
       <label for="amenityTitle">Title</label>
-      <input id="amenityTitle" value="${escapeHtml(amenity.title || "")}" required />
+      <input id="amenityTitle" value="${escapeHtml(localizedForEdit(amenity.title))}" required />
+      <p class="field-hint">Saved automatically in all site languages via DeepL.</p>
     </div>
     <div class="field">
       <label for="amenityText">Description</label>
-      <textarea id="amenityText" rows="3">${escapeHtml(amenity.text || "")}</textarea>
+      <textarea id="amenityText" rows="3">${escapeHtml(localizedForEdit(amenity.text))}</textarea>
     </div>
   `;
 }
@@ -658,8 +671,8 @@ function renderAmenitiesPanel() {
               <div class="entry-card amenity-row">
                 <div class="icon-badge"><span class="material-symbols-outlined">${escapeHtml(a.icon)}</span></div>
                 <div class="entry-main">
-                  <strong>${escapeHtml(a.title)}</strong>
-                  <div class="entry-message">${escapeHtml(a.text)}</div>
+                  <strong>${escapeHtml(localizedForEdit(a.title))}</strong>
+                  <div class="entry-message">${escapeHtml(localizedForEdit(a.text))}</div>
                 </div>
                 <div class="content-actions">
                   <button class="icon-btn" data-edit-amenity="${a.id}" title="Edit"><span class="material-symbols-outlined">edit</span></button>
