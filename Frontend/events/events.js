@@ -1,4 +1,11 @@
 const API_BASE = "/api";
+const lang = localStorage.getItem("php_lang") || "en";
+
+function pickLocalized(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  return value[lang] || value.en || Object.values(value).find(Boolean) || "";
+}
 
 function escapeHtml(str = "") {
   return String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -60,14 +67,14 @@ function render(events) {
                 .map(
                   (ev) => `
                 <article class="event-full-card">
-                  ${ev.imageUrl ? `<img src="${mediaUrl(ev.imageUrl)}" alt="${escapeHtml(ev.title)}" />` : ""}
+                  ${ev.imageUrl ? `<img src="${mediaUrl(ev.imageUrl)}" alt="${escapeHtml(pickLocalized(ev.title))}" />` : ""}
                   <div class="event-full-body">
-                    <h2>${escapeHtml(ev.title)}</h2>
+                    <h2>${escapeHtml(pickLocalized(ev.title))}</h2>
                     <div class="event-full-meta">
                       <span><span class="material-symbols-outlined">event</span>${formatEventDate(ev.date)}</span>
                       ${ev.time ? `<span><span class="material-symbols-outlined">schedule</span>${escapeHtml(ev.time)}</span>` : ""}
                     </div>
-                    <p>${escapeHtmlMultiline(ev.description)}</p>
+                    <p>${escapeHtmlMultiline(pickLocalized(ev.description))}</p>
                     ${
                       ev.infoUrl
                         ? `<a class="btn btn-line event-full-link" href="${escapeHtml(ev.infoUrl)}" target="_blank" rel="noopener">More Information</a>`

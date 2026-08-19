@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
@@ -8,6 +10,7 @@ const compression = require("compression");
 const sharp = require("sharp");
 
 const store = require("./data/store");
+const translate = require("./services/translate");
 
 // Disable sharp's internal input-file cache — without this, re-processing a
 // path sharp has already read can hold that file handle open (observed as
@@ -274,18 +277,23 @@ app.put("/api/admin/settings", requireAdmin, (req, res) => {
 
 /* ---------- Admin: rooms ---------- */
 
-app.post("/api/admin/rooms", requireAdmin, (req, res) => {
+app.post("/api/admin/rooms", requireAdmin, async (req, res) => {
   const { name, type, description, capacity, sizeSqm, basePricePerNight, currency, imageUrl } = req.body || {};
 
   if (!name || !type || !imageUrl) {
     return res.status(400).json({ error: "Name, type and image are required." });
   }
 
+  const [nameI18n, descriptionI18n] = await Promise.all([
+    translate.translateToAllLanguages(name),
+    translate.translateToAllLanguages(description || "")
+  ]);
+
   const room = {
     id: crypto.randomUUID(),
-    name,
+    name: nameI18n,
     type,
-    description: description || "",
+    description: descriptionI18n,
     capacity: Number(capacity) || 1,
     sizeSqm: Number(sizeSqm) || 0,
     basePricePerNight: Number(basePricePerNight) || 0,
@@ -296,11 +304,18 @@ app.post("/api/admin/rooms", requireAdmin, (req, res) => {
   res.status(201).json(store.addRoom(room));
 });
 
-app.put("/api/admin/rooms/:id", requireAdmin, (req, res) => {
+app.put("/api/admin/rooms/:id", requireAdmin, async (req, res) => {
+  const existing = store.getRooms().find((r) => r.id === req.params.id);
+  if (!existing) return res.status(404).json({ error: "Room not found." });
+
   const patch = { ...req.body };
   if (patch.capacity != null) patch.capacity = Number(patch.capacity);
   if (patch.sizeSqm != null) patch.sizeSqm = Number(patch.sizeSqm);
   if (patch.basePricePerNight != null) patch.basePricePerNight = Number(patch.basePricePerNight);
+  if (patch.name !== undefined) patch.name = await translate.translateIfChanged(patch.name, existing.name);
+  if (patch.description !== undefined) {
+    patch.description = await translate.translateIfChanged(patch.description, existing.description);
+  }
 
   const room = store.updateRoom(req.params.id, patch);
   if (!room) return res.status(404).json({ error: "Room not found." });
@@ -346,16 +361,28 @@ app.delete("/api/admin/gallery/:id", requireAdmin, (req, res) => {
 
 /* ---------- Admin: amenities ---------- */
 
-app.post("/api/admin/amenities", requireAdmin, (req, res) => {
+app.post("/api/admin/amenities", requireAdmin, async (req, res) => {
   const { icon, title, text } = req.body || {};
   if (!icon || !title) return res.status(400).json({ error: "Icon and title are required." });
 
-  const amenity = { id: crypto.randomUUID(), icon, title, text: text || "" };
+  const [titleI18n, textI18n] = await Promise.all([
+    translate.translateToAllLanguages(title),
+    translate.translateToAllLanguages(text || "")
+  ]);
+
+  const amenity = { id: crypto.randomUUID(), icon, title: titleI18n, text: textI18n };
   res.status(201).json(store.addAmenity(amenity));
 });
 
-app.put("/api/admin/amenities/:id", requireAdmin, (req, res) => {
-  const amenity = store.updateAmenity(req.params.id, req.body || {});
+app.put("/api/admin/amenities/:id", requireAdmin, async (req, res) => {
+  const existing = store.getAmenities().find((a) => a.id === req.params.id);
+  if (!existing) return res.status(404).json({ error: "Amenity not found." });
+
+  const patch = { ...req.body };
+  if (patch.title !== undefined) patch.title = await translate.translateIfChanged(patch.title, existing.title);
+  if (patch.text !== undefined) patch.text = await translate.translateIfChanged(patch.text, existing.text);
+
+  const amenity = store.updateAmenity(req.params.id, patch);
   if (!amenity) return res.status(404).json({ error: "Amenity not found." });
   res.json(amenity);
 });
@@ -368,16 +395,21 @@ app.delete("/api/admin/amenities/:id", requireAdmin, (req, res) => {
 
 /* ---------- Admin: events ---------- */
 
-app.post("/api/admin/events", requireAdmin, (req, res) => {
+app.post("/api/admin/events", requireAdmin, async (req, res) => {
   const { title, date, time, description, imageUrl, infoUrl } = req.body || {};
   if (!title || !date) return res.status(400).json({ error: "Title and date are required." });
 
+  const [titleI18n, descriptionI18n] = await Promise.all([
+    translate.translateToAllLanguages(title),
+    translate.translateToAllLanguages(description || "")
+  ]);
+
   const event = {
     id: crypto.randomUUID(),
-    title,
+    title: titleI18n,
     date,
     time: time || "",
-    description: description || "",
+    description: descriptionI18n,
     imageUrl: imageUrl || "",
     infoUrl: infoUrl || ""
   };
@@ -385,8 +417,17 @@ app.post("/api/admin/events", requireAdmin, (req, res) => {
   res.status(201).json(store.addEvent(event));
 });
 
-app.put("/api/admin/events/:id", requireAdmin, (req, res) => {
-  const event = store.updateEvent(req.params.id, req.body || {});
+app.put("/api/admin/events/:id", requireAdmin, async (req, res) => {
+  const existing = store.getEvents().find((e) => e.id === req.params.id);
+  if (!existing) return res.status(404).json({ error: "Event not found." });
+
+  const patch = { ...req.body };
+  if (patch.title !== undefined) patch.title = await translate.translateIfChanged(patch.title, existing.title);
+  if (patch.description !== undefined) {
+    patch.description = await translate.translateIfChanged(patch.description, existing.description);
+  }
+
+  const event = store.updateEvent(req.params.id, patch);
   if (!event) return res.status(404).json({ error: "Event not found." });
   res.json(event);
 });
@@ -397,6 +438,57 @@ app.delete("/api/admin/events/:id", requireAdmin, (req, res) => {
   res.status(204).end();
 });
 
+// Fills in missing language versions for rooms/events/amenities that were
+// saved before a DEEPL_API_KEY existed (or while a previous key was invalid).
+// Runs once at boot; once every language slot is filled, subsequent restarts
+// find nothing left to do and skip straight past this without using the API.
+async function backfillTranslations() {
+  if (!translate.isConfigured()) return;
+
+  const needsBackfill = (localized) =>
+    localized && typeof localized === "object" && translate.LANGUAGES.some((lang) => !localized[lang]);
+  const pickSourceText = (localized) => translate.LANGUAGES.map((lang) => localized[lang]).find(Boolean) || "";
+
+  let backfilled = 0;
+
+  for (const room of store.getRooms()) {
+    const patch = {};
+    if (needsBackfill(room.name)) patch.name = await translate.translateToAllLanguages(pickSourceText(room.name));
+    if (needsBackfill(room.description)) {
+      patch.description = await translate.translateToAllLanguages(pickSourceText(room.description));
+    }
+    if (Object.keys(patch).length) {
+      store.updateRoom(room.id, patch);
+      backfilled++;
+    }
+  }
+
+  for (const event of store.getEvents()) {
+    const patch = {};
+    if (needsBackfill(event.title)) patch.title = await translate.translateToAllLanguages(pickSourceText(event.title));
+    if (needsBackfill(event.description)) {
+      patch.description = await translate.translateToAllLanguages(pickSourceText(event.description));
+    }
+    if (Object.keys(patch).length) {
+      store.updateEvent(event.id, patch);
+      backfilled++;
+    }
+  }
+
+  for (const amenity of store.getAmenities()) {
+    const patch = {};
+    if (needsBackfill(amenity.title)) patch.title = await translate.translateToAllLanguages(pickSourceText(amenity.title));
+    if (needsBackfill(amenity.text)) patch.text = await translate.translateToAllLanguages(pickSourceText(amenity.text));
+    if (Object.keys(patch).length) {
+      store.updateAmenity(amenity.id, patch);
+      backfilled++;
+    }
+  }
+
+  if (backfilled) console.log(`DeepL: backfilled translations for ${backfilled} existing item(s).`);
+}
+
 app.listen(PORT, () => {
   console.log(`Park Hotel Panorama API listening on http://localhost:${PORT}`);
+  backfillTranslations().catch((err) => console.warn("Translation backfill failed:", err.message));
 });
