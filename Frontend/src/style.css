@@ -163,6 +163,12 @@ section {
   line-height: 1;
 }
 
+.icon-svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 /* ---------- Top utility bar ---------- */
 .topbar {
   background: var(--pine-900);
