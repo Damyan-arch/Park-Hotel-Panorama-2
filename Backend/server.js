@@ -1,10 +1,18 @@
 const path = require("path");
+const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
+const compression = require("compression");
+const sharp = require("sharp");
 
 const store = require("./data/store");
+
+// Disable sharp's internal input-file cache — without this, re-processing a
+// path sharp has already read can hold that file handle open (observed as
+// EPERM/UNKNOWN errors writing back to the same path on Windows).
+sharp.cache(false);
 
 const PORT = process.env.PORT || 3002;
 const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGIN || "http://localhost:4202")
@@ -34,13 +42,24 @@ app.use(
     }
   })
 );
+app.use(compression());
 app.use(express.json());
-app.use("/images", express.static(path.join(__dirname, "public/images")));
+
+// Images are admin-editable (uploads can replace a file without changing its
+// name), so cache for a day and let ETag revalidation catch changes in between.
+app.use("/images", express.static(path.join(__dirname, "public/images"), { maxAge: "1d" }));
 
 // Serve the built frontend (Frontend/dist, produced by `npm run build`) from this
 // same server/port, so the whole site — including /admin — can be shared behind a
 // single tunnel link instead of forwarding the frontend and backend separately.
 const FRONTEND_DIST = path.join(__dirname, "../Frontend/dist");
+
+// /assets/* filenames are content-hashed by Vite (e.g. main-7Z3AMQnb.js) — a
+// rebuild produces new filenames rather than changing these bytes, so it's safe
+// to cache them indefinitely. index.html / admin/index.html keep the same URL
+// across rebuilds, so they're served below with the default (no long cache),
+// or every deploy would keep serving a stale HTML shell for a year.
+app.use("/assets", express.static(path.join(FRONTEND_DIST, "assets"), { maxAge: "1y", immutable: true }));
 app.use(express.static(FRONTEND_DIST));
 
 const inquiries = [];
@@ -215,10 +234,31 @@ app.patch("/api/admin/inquiries/:id", requireAdmin, (req, res) => {
 /* ---------- Admin: media upload ---------- */
 
 app.post("/api/admin/upload", requireAdmin, (req, res) => {
-  upload.single("image")(req, res, (err) => {
+  upload.single("image")(req, res, async (err) => {
     if (err) return res.status(400).json({ error: err.message });
     if (!req.file) return res.status(400).json({ error: "No image file was provided." });
-    res.status(201).json({ url: `/images/uploads/${req.file.filename}` });
+
+    // Normalize every upload to a size- and format-optimized WebP, so a
+    // full-resolution phone photo doesn't ship to visitors at full size.
+    const rawPath = req.file.path;
+    const baseName = path.parse(req.file.filename).name;
+    const optimizedName = `${baseName}.webp`;
+    const optimizedPath = path.join(path.dirname(rawPath), optimizedName);
+    // sharp can't read and write the same file in one pipeline — the uploaded
+    // file may already be named "<name>.webp", colliding with optimizedPath.
+    const tmpPath = path.join(path.dirname(rawPath), `${baseName}.processing`);
+
+    try {
+      await sharp(rawPath, { limitInputPixels: false })
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: 78 })
+        .toFile(tmpPath);
+      fs.unlinkSync(rawPath);
+      fs.renameSync(tmpPath, optimizedPath);
+      res.status(201).json({ url: `/images/uploads/${optimizedName}` });
+    } catch {
+      res.status(500).json({ error: "Failed to process the uploaded image." });
+    }
   });
 });
 

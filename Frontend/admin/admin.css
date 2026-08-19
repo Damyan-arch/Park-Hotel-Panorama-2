@@ -158,6 +158,15 @@ input {
   flex-wrap: wrap;
 }
 
+.btn-pinned-right {
+  /* Pinned to the viewport's true right edge, independent of .dash's
+     centered max-width — everything else in the header stays put. */
+  position: fixed;
+  top: 32px;
+  right: 24px;
+  z-index: 20;
+}
+
 .dash-header h1 {
   font-family: var(--font-display);
   font-size: 1.6rem;
@@ -187,6 +196,7 @@ input {
   background: var(--cream-050);
   border: 1px solid var(--line);
   color: var(--pine-900);
+  text-decoration: none;
 }
 
 .btn:hover {
@@ -352,6 +362,27 @@ input {
     justify-content: space-between;
     width: 100%;
   }
+}
+
+/* ---------- Live site preview ---------- */
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  /* Break out of .dash's centered max-width AND its horizontal padding so
+     the preview fills the full browser width edge-to-edge, no gutter. */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.preview-frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 200px);
+  min-height: 480px;
+  border: 0;
+  background: #fff;
 }
 
 /* ---------- Panel toolbar ---------- */
@@ -562,23 +593,42 @@ input {
 
 /* ---------- Settings form ---------- */
 .settings-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  align-items: start;
+  width: 90vw;
+  max-width: 1600px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.settings-section {
   background: var(--cream-050);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 28px 30px;
+  padding: 24px 26px;
   box-shadow: var(--shadow-card);
-  max-width: 720px;
 }
 
 .settings-form h4 {
   font-family: var(--font-display);
   color: var(--pine-900);
   font-size: 1.05rem;
-  margin: 26px 0 14px;
+  margin: 0 0 18px;
 }
 
-.settings-form h4:first-child {
-  margin-top: 0;
+.settings-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .settings-form {
+    grid-template-columns: 1fr;
+  }
 }
 
 .save-confirm {

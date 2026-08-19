@@ -572,40 +572,68 @@ function renderSettingsPanel() {
   const s = state.settings;
   return `
     <form id="settingsForm" class="settings-form">
-      <h4>Text & Contact Details</h4>
-      <div class="form-row">
-        <div class="field"><label for="setHotelName">Hotel name</label><input id="setHotelName" value="${escapeHtml(s.hotelName || "")}" /></div>
-        <div class="field"><label for="setPhone">Phone number</label><input id="setPhone" value="${escapeHtml(s.phoneNumber || "")}" /></div>
-      </div>
-      <div class="form-row">
-        <div class="field"><label for="setAddress">Address</label><input id="setAddress" value="${escapeHtml(s.address || "")}" /></div>
-        <div class="field"><label for="setFacebook">Facebook URL</label><input id="setFacebook" value="${escapeHtml(s.facebookUrl || "")}" /></div>
-      </div>
-      <div class="form-row">
-        <div class="field"><label for="setHoursDays">Restaurant days</label><input id="setHoursDays" value="${escapeHtml(s.restaurantHoursDays || "")}" /></div>
-        <div class="field"><label for="setHoursText">Restaurant hours</label><input id="setHoursText" value="${escapeHtml(s.restaurantHoursText || "")}" /></div>
-      </div>
-      <div class="field"><label for="setMapQuery">Map search query</label><input id="setMapQuery" value="${escapeHtml(s.mapQuery || "")}" /></div>
-
-      <h4>Homepage Copy (English)</h4>
-      <div class="field"><label for="setTagline">Hero title</label><input id="setTagline" value="${escapeHtml(s.tagline || "")}" /></div>
-      <div class="field"><label for="setAboutTitle">About title</label><input id="setAboutTitle" value="${escapeHtml(s.aboutTitle || "")}" /></div>
-      <div class="field"><label for="setAboutText">About / hero text</label><textarea id="setAboutText" rows="4">${escapeHtml(s.aboutText || "")}</textarea></div>
-      <p class="field-hint">These override the English homepage copy only — other languages keep their own translations.</p>
-
-      <h4>Site Photos</h4>
-      <div class="form-row">
-        ${imagePickerHtml("setHeroImage", s.heroImage)}
-        ${imagePickerHtml("setRestaurantImage", s.restaurantImage)}
-      </div>
-      <div class="form-row">
-        ${imagePickerHtml("setAboutImage", s.aboutImage)}
-        ${imagePickerHtml("setAboutFloatImage", s.aboutFloatImage)}
+      <div class="settings-section">
+        <h4>Text & Contact Details</h4>
+        <div class="form-row">
+          <div class="field"><label for="setHotelName">Hotel name</label><input id="setHotelName" value="${escapeHtml(s.hotelName || "")}" /></div>
+          <div class="field"><label for="setPhone">Phone number</label><input id="setPhone" value="${escapeHtml(s.phoneNumber || "")}" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="setAddress">Address</label><input id="setAddress" value="${escapeHtml(s.address || "")}" /></div>
+          <div class="field"><label for="setFacebook">Facebook URL</label><input id="setFacebook" value="${escapeHtml(s.facebookUrl || "")}" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="setHoursDays">Restaurant days</label><input id="setHoursDays" value="${escapeHtml(s.restaurantHoursDays || "")}" /></div>
+          <div class="field"><label for="setHoursText">Restaurant hours</label><input id="setHoursText" value="${escapeHtml(s.restaurantHoursText || "")}" /></div>
+        </div>
+        <div class="field"><label for="setMapQuery">Map search query</label><input id="setMapQuery" value="${escapeHtml(s.mapQuery || "")}" /></div>
       </div>
 
-      <div class="modal-error" id="settingsError"></div>
-      <button type="submit" class="btn primary"><span class="material-symbols-outlined">save</span> Save Hotel Info</button>
-      <span class="save-confirm" id="settingsSaved"></span>
+      <div class="settings-section">
+        <h4>Homepage Copy (English)</h4>
+        <div class="field"><label for="setTagline">Hero title</label><input id="setTagline" value="${escapeHtml(s.tagline || "")}" /></div>
+        <div class="field"><label for="setAboutTitle">About title</label><input id="setAboutTitle" value="${escapeHtml(s.aboutTitle || "")}" /></div>
+        <div class="field"><label for="setAboutText">About / hero text</label><textarea id="setAboutText" rows="4">${escapeHtml(s.aboutText || "")}</textarea></div>
+        <p class="field-hint">These override the English homepage copy only — other languages keep their own translations.</p>
+      </div>
+
+      <div class="settings-section">
+        <h4>Hero Stats (English)</h4>
+        <div class="form-row">
+          <div class="field"><label for="setStat1Value">Stat 1 value</label><input id="setStat1Value" value="${escapeHtml(s.heroStat1Value || "")}" placeholder="4" /></div>
+          <div class="field"><label for="setStat1Label">Stat 1 label</label><input id="setStat1Label" value="${escapeHtml(s.heroStat1Label || "")}" placeholder="Room Types" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="setStat2Value">Stat 2 value</label><input id="setStat2Value" value="${escapeHtml(s.heroStat2Value || "")}" placeholder="6+" /></div>
+          <div class="field"><label for="setStat2Label">Stat 2 label</label><input id="setStat2Label" value="${escapeHtml(s.heroStat2Label || "")}" placeholder="Local Experiences" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="setStat3Value">Stat 3 value</label><input id="setStat3Value" value="${escapeHtml(s.heroStat3Value || "")}" placeholder="< 2h" /></div>
+          <div class="field"><label for="setStat3Label">Stat 3 label</label><input id="setStat3Label" value="${escapeHtml(s.heroStat3Label || "")}" placeholder="Avg. Reply Time" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="setStat4Value">Stat 4 value</label><input id="setStat4Value" value="${escapeHtml(s.heroStat4Value || "")}" placeholder="5★" /></div>
+          <div class="field"><label for="setStat4Label">Stat 4 label</label><input id="setStat4Label" value="${escapeHtml(s.heroStat4Label || "")}" placeholder="Guest Rated" /></div>
+        </div>
+        <p class="field-hint">Leave a label blank to keep the default translated label for that language.</p>
+      </div>
+
+      <div class="settings-section">
+        <h4>Site Photos</h4>
+        <div class="form-row">
+          ${imagePickerHtml("setHeroImage", s.heroImage)}
+          ${imagePickerHtml("setRestaurantImage", s.restaurantImage)}
+        </div>
+        <div class="form-row">
+          ${imagePickerHtml("setAboutImage", s.aboutImage)}
+          ${imagePickerHtml("setAboutFloatImage", s.aboutFloatImage)}
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <div class="modal-error" id="settingsError"></div>
+        <span class="save-confirm" id="settingsSaved"></span>
+      </div>
     </form>
   `;
 }
@@ -641,7 +669,15 @@ function wireSettingsPanel() {
         mapQuery: form.querySelector("#setMapQuery").value.trim(),
         tagline: form.querySelector("#setTagline").value.trim(),
         aboutTitle: form.querySelector("#setAboutTitle").value.trim(),
-        aboutText: form.querySelector("#setAboutText").value.trim()
+        aboutText: form.querySelector("#setAboutText").value.trim(),
+        heroStat1Value: form.querySelector("#setStat1Value").value.trim(),
+        heroStat1Label: form.querySelector("#setStat1Label").value.trim(),
+        heroStat2Value: form.querySelector("#setStat2Value").value.trim(),
+        heroStat2Label: form.querySelector("#setStat2Label").value.trim(),
+        heroStat3Value: form.querySelector("#setStat3Value").value.trim(),
+        heroStat3Label: form.querySelector("#setStat3Label").value.trim(),
+        heroStat4Value: form.querySelector("#setStat4Value").value.trim(),
+        heroStat4Label: form.querySelector("#setStat4Label").value.trim()
       };
 
       for (const [inputId, field] of imageFields) {
@@ -661,6 +697,7 @@ function wireSettingsPanel() {
 /* ---------- Dashboard shell ---------- */
 
 const TABS = [
+  { key: "preview", label: "Live Site" },
   { key: "bookings", label: "Booking Requests" },
   { key: "inquiries", label: "Contact Messages" },
   { key: "rooms", label: "Rooms" },
@@ -678,9 +715,19 @@ function tabCount(key) {
   return null;
 }
 
+function renderPreviewPanel() {
+  return `
+    <div class="preview-panel">
+      <iframe class="preview-frame" id="previewFrame" src="/" title="Public site preview"></iframe>
+    </div>
+  `;
+}
+
 function renderPanel() {
   if (state.loading) return `<div class="loading-state">Loading…</div>`;
   switch (state.tab) {
+    case "preview":
+      return renderPreviewPanel();
     case "bookings":
     case "inquiries":
       return renderLeadsPanel(state.tab);
@@ -712,6 +759,8 @@ function renderDashboard() {
           <button class="btn logout" id="logoutBtn"><span class="material-symbols-outlined">logout</span> Sign Out</button>
         </div>
       </div>
+      ${state.tab === "preview" ? `<a class="btn btn-pinned-right" href="/" target="_blank" rel="noopener"><span class="material-symbols-outlined">open_in_new</span> Open in New Tab</a>` : ""}
+      ${state.tab === "settings" ? `<button type="submit" form="settingsForm" class="btn primary btn-pinned-right"><span class="material-symbols-outlined">save</span> Save Hotel Info</button>` : ""}
 
       <div class="tabs">
         ${TABS.map((tab) => {

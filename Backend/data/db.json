@@ -15,7 +15,15 @@
     "heroImage": "/images/gallery/lounge-lobby.webp",
     "aboutImage": "/images/gallery/courtyard-garden.webp",
     "aboutFloatImage": "/images/gallery/rose-garden.webp",
-    "restaurantImage": "/images/gallery/restaurant-hall.webp"
+    "restaurantImage": "/images/gallery/restaurant-hall.webp",
+    "heroStat1Value": "4",
+    "heroStat1Label": "",
+    "heroStat2Value": "6+",
+    "heroStat2Label": "",
+    "heroStat3Value": "< 2h",
+    "heroStat3Label": "",
+    "heroStat4Value": "5★",
+    "heroStat4Label": ""
   },
   "rooms": [
     {

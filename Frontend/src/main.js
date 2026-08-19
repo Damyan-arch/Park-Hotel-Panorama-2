@@ -1,6 +1,3 @@
-// The backend serves this app's built files directly (see Backend/server.js),
-// and the Vite dev server proxies /api and /images to it (see vite.config.js) —
-// so relative paths work the same in dev and once shared behind a single tunnel link.
 const API_BASE = "/api";
 const MEDIA_BASE = "";
 
@@ -268,7 +265,15 @@ const FALLBACK_SETTINGS = {
   heroImage: "/images/gallery/lounge-lobby.webp",
   aboutImage: "/images/gallery/courtyard-garden.webp",
   aboutFloatImage: "/images/gallery/rose-garden.webp",
-  restaurantImage: "/images/gallery/restaurant-hall.webp"
+  restaurantImage: "/images/gallery/restaurant-hall.webp",
+  heroStat1Value: "4",
+  heroStat1Label: "",
+  heroStat2Value: "6+",
+  heroStat2Label: "",
+  heroStat3Value: "< 2h",
+  heroStat3Label: "",
+  heroStat4Value: "5★",
+  heroStat4Label: ""
 };
 
 const FALLBACK_AMENITIES = [];
@@ -359,7 +364,7 @@ function renderShell() {
     <header class="site-header">
       <div class="container nav-row">
         <a href="#home" class="brand">
-          <img src="/images/brand/logo-mark.png" alt="Park Hotel Panorama logo" />
+          <img src="/images/brand/logo-mark-v2.png" alt="Park Hotel Panorama logo" />
           <span>Park Hotel Panorama<small>Tryavna, Bulgaria</small></span>
         </a>
         <nav class="main-nav" id="mainNav">
@@ -397,10 +402,10 @@ function renderShell() {
             <a class="btn btn-outline" href="tel:+359897820065"><span class="material-symbols-outlined">call</span> ${t("hero.callNow")}</a>
           </div>
           <div class="hero-stats">
-            <div><strong>4</strong><span>${t("hero.stat1")}</span></div>
-            <div><strong>6+</strong><span>${t("hero.stat2")}</span></div>
-            <div><strong>&lt; 2h</strong><span>${t("hero.stat3")}</span></div>
-            <div><strong>5★</strong><span>${t("hero.stat4")}</span></div>
+            <div><strong>${escapeHtml(state.settings.heroStat1Value)}</strong><span>${tOrSetting("hero.stat1", state.settings.heroStat1Label)}</span></div>
+            <div><strong>${escapeHtml(state.settings.heroStat2Value)}</strong><span>${tOrSetting("hero.stat2", state.settings.heroStat2Label)}</span></div>
+            <div><strong>${escapeHtml(state.settings.heroStat3Value)}</strong><span>${tOrSetting("hero.stat3", state.settings.heroStat3Label)}</span></div>
+            <div><strong>${escapeHtml(state.settings.heroStat4Value)}</strong><span>${tOrSetting("hero.stat4", state.settings.heroStat4Label)}</span></div>
           </div>
         </div>
       </section>
@@ -425,8 +430,8 @@ function renderShell() {
       <section class="about" id="about">
         <div class="container">
           <div class="about-media">
-            <div class="main-shot"><img src="${mediaUrl(state.settings.aboutImage)}" alt="Hotel courtyard and garden" /></div>
-            <div class="float-shot"><img src="${mediaUrl(state.settings.aboutFloatImage)}" alt="Rose garden" /></div>
+            <div class="main-shot"><img src="${mediaUrl(state.settings.aboutImage)}" alt="Hotel courtyard and garden" loading="lazy" /></div>
+            <div class="float-shot"><img src="${mediaUrl(state.settings.aboutFloatImage)}" alt="Rose garden" loading="lazy" /></div>
           </div>
           <div class="about-copy">
             <div class="eyebrow">${t("about.eyebrow")}</div>
@@ -479,7 +484,7 @@ function renderShell() {
 
       <div class="restaurant-info">
         <div class="restaurant-photo">
-          <img src="${mediaUrl(state.settings.restaurantImage)}" alt="Restaurant dining hall" />
+          <img src="${mediaUrl(state.settings.restaurantImage)}" alt="Restaurant dining hall" loading="lazy" />
         </div>
         <div class="restaurant-hours">
           <div>
@@ -576,7 +581,7 @@ function renderShell() {
         <div class="footer-top">
           <div>
             <div class="footer-brand">
-              <img src="/images/brand/logo-mark.png" alt="Park Hotel Panorama logo" />
+              <img src="/images/brand/logo-mark-v2.png" alt="Park Hotel Panorama logo" />
               Park Hotel Panorama
             </div>
             <p>${t("footer.tagline")}</p>
