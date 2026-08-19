@@ -18,6 +18,7 @@ let state = {
   inquiries: [],
   rooms: [],
   gallery: [],
+  events: [],
   amenities: [],
   settings: {},
   loading: false,
@@ -78,11 +79,12 @@ async function loadData() {
   state.loading = true;
   render();
   try {
-    const [bookings, inquiries, rooms, gallery, amenities, settings] = await Promise.all([
+    const [bookings, inquiries, rooms, gallery, events, amenities, settings] = await Promise.all([
       apiFetch("/admin/bookings"),
       apiFetch("/admin/inquiries"),
       apiFetch("/rooms"),
       apiFetch("/gallery"),
+      apiFetch("/events"),
       apiFetch("/amenities"),
       apiFetch("/settings")
     ]);
@@ -90,6 +92,7 @@ async function loadData() {
     state.inquiries = inquiries;
     state.rooms = rooms;
     state.gallery = [...gallery].sort((a, b) => a.sortOrder - b.sortOrder);
+    state.events = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
     state.amenities = amenities;
     state.settings = settings;
   } catch (err) {
@@ -472,6 +475,111 @@ function renderGalleryPanel() {
   `;
 }
 
+/* ---------- Events ---------- */
+
+function eventFormFields(event = {}) {
+  return `
+    ${imagePickerHtml("eventImage", event.imageUrl)}
+    <div class="field">
+      <label for="eventTitle">Title</label>
+      <input id="eventTitle" value="${escapeHtml(event.title || "")}" required />
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="eventDate">Date</label>
+        <input id="eventDate" type="date" value="${escapeHtml(event.date || "")}" required />
+      </div>
+      <div class="field">
+        <label for="eventTime">Time</label>
+        <input id="eventTime" value="${escapeHtml(event.time || "")}" placeholder="e.g. 7:00 PM" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="eventDescription">Description</label>
+      <textarea id="eventDescription" rows="3">${escapeHtml(event.description || "")}</textarea>
+    </div>
+    <div class="field">
+      <label for="eventInfoUrl">More information link (optional)</label>
+      <input id="eventInfoUrl" type="url" value="${escapeHtml(event.infoUrl || "")}" placeholder="https://…" />
+      <p class="field-hint">If set, the events page shows a "More Information" button linking here.</p>
+    </div>
+  `;
+}
+
+function openEventModal(event = null) {
+  openModal({
+    title: event ? "Edit Event" : "Add Event",
+    bodyHtml: eventFormFields(event || {}),
+    submitLabel: event ? "Save Changes" : "Add Event",
+    onMount: (form) => wireImagePicker(form, "eventImage"),
+    onSubmit: async (form) => {
+      const imageFile = form.querySelector("#eventImage").files[0];
+      let imageUrl = event?.imageUrl || "";
+      if (imageFile) imageUrl = await uploadImage(imageFile);
+
+      const payload = {
+        title: form.querySelector("#eventTitle").value.trim(),
+        date: form.querySelector("#eventDate").value,
+        time: form.querySelector("#eventTime").value.trim(),
+        description: form.querySelector("#eventDescription").value.trim(),
+        imageUrl,
+        infoUrl: form.querySelector("#eventInfoUrl").value.trim()
+      };
+
+      if (event) {
+        await apiFetch(`/admin/events/${event.id}`, { method: "PUT", body: JSON.stringify(payload) });
+      } else {
+        await apiFetch("/admin/events", { method: "POST", body: JSON.stringify(payload) });
+      }
+    }
+  });
+}
+
+async function deleteEvent(id) {
+  if (!confirm("Delete this event? This cannot be undone.")) return;
+  try {
+    await apiFetch(`/admin/events/${id}`, { method: "DELETE" });
+    await loadData();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function formatEventDate(dateStr) {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function renderEventsPanel() {
+  return `
+    <div class="panel-toolbar">
+      <button class="btn primary" id="addEventBtn"><span class="material-symbols-outlined">add</span> Add Event</button>
+    </div>
+    ${
+      state.events.length
+        ? `<div class="card-grid">
+            ${state.events
+              .map(
+                (e) => `
+              <div class="content-card">
+                ${e.imageUrl ? `<img class="content-thumb" src="${mediaUrl(e.imageUrl)}" alt="${escapeHtml(e.title)}" />` : ""}
+                <div class="content-body">
+                  <strong>${escapeHtml(e.title)}</strong>
+                  <span class="content-sub">${formatEventDate(e.date)}${e.time ? ` · ${escapeHtml(e.time)}` : ""}</span>
+                </div>
+                <div class="content-actions">
+                  <button class="icon-btn" data-edit-event="${e.id}" title="Edit"><span class="material-symbols-outlined">edit</span></button>
+                  <button class="icon-btn danger" data-delete-event="${e.id}" title="Delete"><span class="material-symbols-outlined">delete</span></button>
+                </div>
+              </div>`
+              )
+              .join("")}
+          </div>`
+        : `<div class="empty-state">No events yet.</div>`
+    }
+  `;
+}
+
 /* ---------- Amenities ---------- */
 
 function amenityFormFields(amenity = {}) {
@@ -702,6 +810,7 @@ const TABS = [
   { key: "inquiries", label: "Contact Messages" },
   { key: "rooms", label: "Rooms" },
   { key: "gallery", label: "Gallery" },
+  { key: "events", label: "Events" },
   { key: "amenities", label: "Amenities" },
   { key: "settings", label: "Hotel Info" }
 ];
@@ -711,6 +820,7 @@ function tabCount(key) {
   if (key === "inquiries") return state.inquiries.length;
   if (key === "rooms") return state.rooms.length;
   if (key === "gallery") return state.gallery.length;
+  if (key === "events") return state.events.length;
   if (key === "amenities") return state.amenities.length;
   return null;
 }
@@ -735,6 +845,8 @@ function renderPanel() {
       return renderRoomsPanel();
     case "gallery":
       return renderGalleryPanel();
+    case "events":
+      return renderEventsPanel();
     case "amenities":
       return renderAmenitiesPanel();
     case "settings":
@@ -810,6 +922,14 @@ function wirePanelEvents() {
   );
   panel.querySelectorAll("[data-delete-gallery]").forEach((btn) =>
     btn.addEventListener("click", () => deleteGalleryImage(btn.dataset.deleteGallery))
+  );
+
+  panel.querySelector("#addEventBtn")?.addEventListener("click", () => openEventModal());
+  panel.querySelectorAll("[data-edit-event]").forEach((btn) =>
+    btn.addEventListener("click", () => openEventModal(state.events.find((e) => e.id === btn.dataset.editEvent)))
+  );
+  panel.querySelectorAll("[data-delete-event]").forEach((btn) =>
+    btn.addEventListener("click", () => deleteEvent(btn.dataset.deleteEvent))
   );
 
   panel.querySelector("#addAmenityBtn")?.addEventListener("click", () => openAmenityModal());

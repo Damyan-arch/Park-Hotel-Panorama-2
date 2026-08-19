@@ -163,6 +163,12 @@ section {
   line-height: 1;
 }
 
+.icon-svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 /* ---------- Top utility bar ---------- */
 .topbar {
   background: var(--pine-900);
@@ -1319,6 +1325,93 @@ footer.site-footer {
 @media (max-width: 600px) {
   section { padding: 64px 0; }
   .hero { min-height: 100vh; }
+}
+
+/* ---------- Floating events widget ---------- */
+.events-widget {
+  position: fixed;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  z-index: 55;
+  width: 260px;
+  background: var(--cream-050);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+}
+
+.events-widget-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pine-900);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  margin-bottom: 14px;
+}
+
+.events-widget-head .material-symbols-outlined {
+  color: var(--gold-500);
+}
+
+.events-widget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.events-widget-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.events-widget-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.events-widget-item img {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.events-widget-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.events-widget-item strong {
+  font-size: 0.9rem;
+  color: var(--ink-900);
+}
+
+.events-widget-item span {
+  font-size: 0.8rem;
+  color: var(--ink-600);
+}
+
+.events-widget-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 18px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1100px) {
+  .events-widget {
+    display: none;
+  }
 }
 
 /* ---------- Booking ---------- */

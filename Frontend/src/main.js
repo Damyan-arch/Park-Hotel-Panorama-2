@@ -1,6 +1,8 @@
 const API_BASE = "/api";
 const MEDIA_BASE = "";
 
+const FACEBOOK_ICON_SVG = `<svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.505 17.523 2 12 2S2 6.505 2 12.06c0 5.02 3.657 9.184 8.438 9.94v-7.03H7.898v-2.91h2.54V9.845c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.459h-1.26c-1.243 0-1.63.771-1.63 1.562v1.877h2.773l-.443 2.91h-2.33V22c4.78-.756 8.437-4.92 8.437-9.94Z"/></svg>`;
+
 function mediaUrl(pathOrUrl) {
   if (!pathOrUrl) return "";
   return /^https?:\/\//.test(pathOrUrl) ? pathOrUrl : `${MEDIA_BASE}${pathOrUrl}`;
@@ -61,7 +63,8 @@ const I18N = {
     "footer.tagline": "A boutique mountain retreat in Tryavna, Bulgaria — comfort, elegance and warm Balkan hospitality.",
     "footer.explore": "Explore", "footer.contact": "Contact", "footer.rights": "All rights reserved.",
     "footer.designNote": "Design concept v2 — built for a faster, friendlier experience.",
-    "fab.callNow": "Call Now"
+    "fab.callNow": "Call Now",
+    "events.widgetTitle": "Upcoming Events", "events.seeMore": "See More Information"
   },
   bg: {
     "nav.home": "Начало", "nav.about": "За нас", "nav.rooms": "Стаи", "nav.restaurant": "Ресторант",
@@ -107,7 +110,8 @@ const I18N = {
     "footer.tagline": "Бутиков планински хотел в Трявна, България — комфорт, елегантност и топло балканско посрещане.",
     "footer.explore": "Разгледайте", "footer.contact": "Контакти", "footer.rights": "Всички права запазени.",
     "footer.designNote": "Дизайн концепция v2 — създадена за по-бързо и приятно преживяване.",
-    "fab.callNow": "Обадете се"
+    "fab.callNow": "Обадете се",
+    "events.widgetTitle": "Предстоящи събития", "events.seeMore": "Вижте повече информация"
   },
   de: {
     "nav.home": "Startseite", "nav.about": "Über uns", "nav.rooms": "Zimmer", "nav.restaurant": "Restaurant",
@@ -153,7 +157,8 @@ const I18N = {
     "footer.tagline": "Ein Boutique-Berghotel in Tryavna, Bulgarien — Komfort, Eleganz und herzliche Balkan-Gastfreundschaft.",
     "footer.explore": "Entdecken", "footer.contact": "Kontakt", "footer.rights": "Alle Rechte vorbehalten.",
     "footer.designNote": "Design-Konzept v2 — für ein schnelleres, freundlicheres Erlebnis entwickelt.",
-    "fab.callNow": "Jetzt anrufen"
+    "fab.callNow": "Jetzt anrufen",
+    "events.widgetTitle": "Kommende Veranstaltungen", "events.seeMore": "Weitere Informationen"
   },
   es: {
     "nav.home": "Inicio", "nav.about": "Sobre nosotros", "nav.rooms": "Habitaciones", "nav.restaurant": "Restaurante",
@@ -199,7 +204,8 @@ const I18N = {
     "footer.tagline": "Un retiro de montaña boutique en Tryavna, Bulgaria — confort, elegancia y cálida hospitalidad balcánica.",
     "footer.explore": "Explorar", "footer.contact": "Contacto", "footer.rights": "Todos los derechos reservados.",
     "footer.designNote": "Concepto de diseño v2 — creado para una experiencia más rápida y cercana.",
-    "fab.callNow": "Llamar ahora"
+    "fab.callNow": "Llamar ahora",
+    "events.widgetTitle": "Próximos Eventos", "events.seeMore": "Ver Más Información"
   },
   ro: {
     "nav.home": "Acasă", "nav.about": "Despre noi", "nav.rooms": "Camere", "nav.restaurant": "Restaurant",
@@ -245,7 +251,8 @@ const I18N = {
     "footer.tagline": "Un refugiu montan boutique în Tryavna, Bulgaria — confort, eleganță și ospitalitate balcanică caldă.",
     "footer.explore": "Explorează", "footer.contact": "Contact", "footer.rights": "Toate drepturile rezervate.",
     "footer.designNote": "Concept de design v2 — creat pentru o experiență mai rapidă și mai prietenoasă.",
-    "fab.callNow": "Sună acum"
+    "fab.callNow": "Sună acum",
+    "events.widgetTitle": "Evenimente Viitoare", "events.seeMore": "Vezi Mai Multe Informații"
   }
 };
 
@@ -284,6 +291,7 @@ let state = {
   amenities: FALLBACK_AMENITIES,
   rooms: [],
   gallery: [],
+  events: [],
   booking: { checkIn: null, checkOut: null, roomId: "", calendarMonth: startOfMonth(new Date()) }
 };
 
@@ -565,7 +573,7 @@ function renderShell() {
                   <span>${escapeHtml(state.settings.address)}</span>
                 </a>
                 <a class="booking-contact-item" href="${state.settings.facebookUrl}" target="_blank" rel="noopener" aria-label="${t("contact.followUs")}">
-                  <span class="icon-badge"><span class="material-symbols-outlined">thumb_up</span></span>
+                  <span class="icon-badge">${FACEBOOK_ICON_SVG}</span>
                   <span>${t("contact.followUs")}</span>
                 </a>
               </div>
@@ -587,7 +595,7 @@ function renderShell() {
             <p>${t("footer.tagline")}</p>
             <div class="footer-social">
               <a href="${state.settings.facebookUrl}" target="_blank" rel="noopener" aria-label="Facebook">
-                <span class="material-symbols-outlined">thumb_up</span>
+                ${FACEBOOK_ICON_SVG}
               </a>
             </div>
           </div>
@@ -621,6 +629,35 @@ function renderShell() {
       <span class="pulse"></span>
       <span class="label">${t("fab.callNow")}</span>
     </a>
+
+    ${
+      state.events.length
+        ? `<div class="events-widget">
+            <div class="events-widget-head">
+              <span class="material-symbols-outlined">event</span>
+              <strong>${t("events.widgetTitle")}</strong>
+            </div>
+            <div class="events-widget-list">
+              ${state.events
+                .slice(0, 2)
+                .map(
+                  (ev) => `
+                <div class="events-widget-item">
+                  ${ev.imageUrl ? `<img src="${mediaUrl(ev.imageUrl)}" alt="${escapeHtml(ev.title)}" />` : ""}
+                  <div class="events-widget-item-text">
+                    <strong>${escapeHtml(ev.title)}</strong>
+                    <span>${formatDateLabel(new Date(ev.date))}</span>
+                  </div>
+                </div>`
+                )
+                .join("")}
+            </div>
+            <a class="btn btn-gold events-widget-btn" href="/events/" target="_blank" rel="noopener">
+              ${t("events.seeMore")}
+            </a>
+          </div>`
+        : ""
+    }
 
     <div class="lightbox" id="lightbox">
       <button class="lightbox-close" id="lightboxClose"><span class="material-symbols-outlined">close</span></button>
@@ -1050,17 +1087,19 @@ function renderAll() {
 async function init() {
   renderAll();
 
-  const [settings, amenities, rooms, gallery] = await Promise.all([
+  const [settings, amenities, rooms, gallery, events] = await Promise.all([
     fetchJSON("/settings", FALLBACK_SETTINGS),
     fetchJSON("/amenities", FALLBACK_AMENITIES),
     fetchJSON("/rooms", []),
-    fetchJSON("/gallery", [])
+    fetchJSON("/gallery", []),
+    fetchJSON("/events", [])
   ]);
 
   state.settings = settings;
   state.amenities = amenities;
   state.rooms = rooms;
   state.gallery = gallery;
+  state.events = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
   renderAll();
 }
 

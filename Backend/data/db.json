@@ -6,7 +6,7 @@
     "phoneHref": "tel:+359897820065",
     "address": "Tryavna, Bulgaria",
     "mapQuery": "Park Hotel Panorama, Tryavna, Bulgaria",
-    "facebookUrl": "https://www.facebook.com/",
+    "facebookUrl": "https://www.facebook.com/people/Park-Hotel-Panorama-Tryavna/61577866605747/",
     "restaurantHoursDays": "Mon – Sun",
     "restaurantHoursText": "From 7:00 PM to 10:30 PM",
     "aboutTitle": "A harmonious blend of comfort and elegance",
@@ -107,6 +107,17 @@
       "imageUrl": "/images/gallery/rose-garden.webp",
       "alt": "Rose garden",
       "sortOrder": 5
+    }
+  ],
+  "events": [
+    {
+      "id": "ev-rodzheta-contest",
+      "title": "Rodzheta Contest — The Living Heritage",
+      "date": "2026-09-19",
+      "time": "Sat–Sun, Sept 19–20",
+      "description": "A two-day heritage celebration hosted at Park Hotel Panorama: a folk costume and tradition contest with individual and group categories, prizes for the most authentic representation, plus a craft market with local products and homemade goods.\nContest entries: 089 057 2865\nHotel bookings: 089 782 0065.",
+      "imageUrl": "/images/events/rodzheta-contest.webp",
+      "infoUrl": "https://festnashevicata.blogspot.com/2026/08/blog-post.html"
     }
   ],
   "amenities": [
