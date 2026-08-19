@@ -1,0 +1,150 @@
+{
+  "settings": {
+    "hotelName": "Park Hotel Panorama",
+    "tagline": "",
+    "phoneNumber": "+359 897 820 065",
+    "phoneHref": "tel:+359897820065",
+    "address": "Tryavna, Bulgaria",
+    "mapQuery": "Park Hotel Panorama, Tryavna, Bulgaria",
+    "facebookUrl": "https://www.facebook.com/",
+    "restaurantHoursDays": "Mon – Sun",
+    "restaurantHoursText": "From 7:00 PM to 10:30 PM",
+    "aboutTitle": "A harmonious blend of comfort and elegance",
+    "aboutText": "Our charming hotel in the heart of the Balkan Mountains offers a serene atmosphere, well-appointed rooms and high-end amenities, wrapped in the regional design charm of Tryavna — all backed by attentive, always-reachable service.",
+    "copyrightYear": 2026,
+    "heroImage": "/images/gallery/lounge-lobby.webp",
+    "aboutImage": "/images/gallery/courtyard-garden.webp",
+    "aboutFloatImage": "/images/gallery/rose-garden.webp",
+    "restaurantImage": "/images/gallery/restaurant-hall.webp",
+    "heroStat1Value": "4",
+    "heroStat1Label": "",
+    "heroStat2Value": "6+",
+    "heroStat2Label": "",
+    "heroStat3Value": "< 2h",
+    "heroStat3Label": "",
+    "heroStat4Value": "5★",
+    "heroStat4Label": ""
+  },
+  "rooms": [
+    {
+      "id": "f6d3eca6-6466-4e25-a9a0-bc65cdaa2784",
+      "name": "Apartment with Balcony",
+      "type": "SUITE",
+      "description": "A spacious apartment with a private balcony framing the Balkan Mountains, a separate lounge area and room for the whole family to spread out.",
+      "capacity": 4,
+      "sizeSqm": 42,
+      "basePricePerNight": 100,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/apartment-balcony.webp"
+    },
+    {
+      "id": "b82fc8cb-0ed4-4f01-89ef-66fc3b40e731",
+      "name": "Double Room with Balcony",
+      "type": "DOUBLE",
+      "description": "A calm, well-appointed double room with balcony access, ideal for couples visiting Tryavna for a quiet mountain escape.",
+      "capacity": 2,
+      "sizeSqm": 30,
+      "basePricePerNight": 70,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/double-room-balcony.webp"
+    },
+    {
+      "id": "204bef47-c659-46fc-a7b0-e7b5b5b3ff2b",
+      "name": "Town Suite",
+      "type": "SUITE",
+      "description": "Our largest suite, combining regional design charm with high-end comfort — steps away from Tryavna's old town.",
+      "capacity": 4,
+      "sizeSqm": 49,
+      "basePricePerNight": 110,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/town-suite.webp"
+    },
+    {
+      "id": "9a332e54-5d7b-41e0-a47f-b3ce35748f82",
+      "name": "Triple Room with Balcony",
+      "type": "FAMILY",
+      "description": "A comfortable triple room with balcony, well suited for small families or friends travelling together.",
+      "capacity": 3,
+      "sizeSqm": 30,
+      "basePricePerNight": 85,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/triple-room-balcony.webp"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "2ed3b27e-a491-4647-b7cb-281a87dae98f",
+      "imageUrl": "/images/gallery/lounge-lobby.webp",
+      "alt": "Hotel lounge with mountain views",
+      "sortOrder": 0
+    },
+    {
+      "id": "dadbdc41-f1ef-44e4-a10a-d7efa21a426d",
+      "imageUrl": "/images/gallery/restaurant-hall.webp",
+      "alt": "Restaurant dining hall",
+      "sortOrder": 1
+    },
+    {
+      "id": "6b8f75e6-6de2-4fa3-9b79-5b1c8f42fcdf",
+      "imageUrl": "/images/gallery/twin-room.webp",
+      "alt": "Twin room",
+      "sortOrder": 2
+    },
+    {
+      "id": "b1fec127-5738-4a5d-b8fc-9051c70e86c7",
+      "imageUrl": "/images/gallery/room-lounge.webp",
+      "alt": "Room sitting area",
+      "sortOrder": 3
+    },
+    {
+      "id": "1eb5b372-b380-40d2-8642-be1837b0e936",
+      "imageUrl": "/images/gallery/courtyard-garden.webp",
+      "alt": "Hotel courtyard and garden",
+      "sortOrder": 4
+    },
+    {
+      "id": "0d91fdc2-6711-4188-a97d-078adcfae3a0",
+      "imageUrl": "/images/gallery/rose-garden.webp",
+      "alt": "Rose garden",
+      "sortOrder": 5
+    }
+  ],
+  "amenities": [
+    {
+      "id": "am-spa",
+      "icon": "spa",
+      "title": "Pool & Spa",
+      "text": "Unwind in our spa centre with sauna, steam bath and a heated pool."
+    },
+    {
+      "id": "am-museum",
+      "icon": "museum",
+      "title": "Cultural Sites",
+      "text": "Museums, workshops and cultural landmarks are all within easy reach."
+    },
+    {
+      "id": "am-bike",
+      "icon": "directions_bike",
+      "title": "Bike Trails",
+      "text": "Explore scenic bike trails starting right from the hotel's doorstep."
+    },
+    {
+      "id": "am-cuisine",
+      "icon": "restaurant",
+      "title": "Local Cuisine",
+      "text": "Taste authentic Bulgarian flavours and traditional regional specialties."
+    },
+    {
+      "id": "am-wine",
+      "icon": "wine_bar",
+      "title": "Wineries",
+      "text": "Guided wine tastings and vineyard visits in the surrounding valleys."
+    },
+    {
+      "id": "am-hiking",
+      "icon": "hiking",
+      "title": "Hiking Trails",
+      "text": "Trails for every level, from gentle village walks to mountain peaks."
+    }
+  ]
+}
