@@ -1,14 +1,9 @@
 // The backend serves this app's built files directly (see Backend/server.js),
-// and the Vite dev server proxies /api and /images to it (see vite.config.js) —
-// so relative paths work the same in dev and once shared behind a single tunnel link.
 const API_BASE = "/api";
 const MEDIA_BASE = "";
 const TOKEN_KEY = "php_admin_token";
 
-// Rooms/events/amenities are stored as { en, bg, de, es, ro } once DeepL
-// translation is set up on the backend. The admin form only ever shows/edits
-// one text box per field — English if present, otherwise whatever language
-// is populated (e.g. content saved before a DeepL key existed).
+// Rooms/events/amenities are stored as { en, bg, de, es, ro }
 function localizedForEdit(value) {
   if (value == null) return "";
   if (typeof value === "string") return value;
@@ -740,6 +735,24 @@ function renderSettingsPanel() {
       </div>
 
       <div class="settings-section">
+        <h4>Family & Leisure (English)</h4>
+        <div class="field"><label for="setLeisurePlayTitle">Playground block title</label><input id="setLeisurePlayTitle" value="${escapeHtml(s.leisurePlayTitle || "")}" placeholder="Kids' Adventure Playground" /></div>
+        <div class="field"><label for="setLeisurePlayText">Playground block text</label><textarea id="setLeisurePlayText" rows="3">${escapeHtml(s.leisurePlayText || "")}</textarea></div>
+        <div class="field"><label for="setLeisureSpaTitle">Hot tub block title</label><input id="setLeisureSpaTitle" value="${escapeHtml(s.leisureSpaTitle || "")}" placeholder="Sunset Hot Tub" /></div>
+        <div class="field"><label for="setLeisureSpaText">Hot tub block text</label><textarea id="setLeisureSpaText" rows="3">${escapeHtml(s.leisureSpaText || "")}</textarea></div>
+        <p class="field-hint">These override the English copy only — other languages keep their own translations.</p>
+        <div class="form-row">
+          ${imagePickerHtml("setLeisurePlayImage1", s.leisurePlayImage1)}
+          ${imagePickerHtml("setLeisurePlayImage2", s.leisurePlayImage2)}
+        </div>
+        <div class="form-row">
+          ${imagePickerHtml("setLeisurePlayImage3", s.leisurePlayImage3)}
+          ${imagePickerHtml("setLeisurePlayImage4", s.leisurePlayImage4)}
+        </div>
+        ${imagePickerHtml("setLeisureSpaImage", s.leisureSpaImage)}
+      </div>
+
+      <div class="settings-section">
         <h4>Site Photos</h4>
         <div class="form-row">
           ${imagePickerHtml("setHeroImage", s.heroImage)}
@@ -763,7 +776,10 @@ function wireSettingsPanel() {
   const form = document.getElementById("settingsForm");
   if (!form) return;
 
-  ["setHeroImage", "setRestaurantImage", "setAboutImage", "setAboutFloatImage"].forEach((id) => wireImagePicker(form, id));
+  [
+    "setHeroImage", "setRestaurantImage", "setAboutImage", "setAboutFloatImage",
+    "setLeisurePlayImage1", "setLeisurePlayImage2", "setLeisurePlayImage3", "setLeisurePlayImage4", "setLeisureSpaImage"
+  ].forEach((id) => wireImagePicker(form, id));
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -777,7 +793,12 @@ function wireSettingsPanel() {
         ["setHeroImage", "heroImage"],
         ["setRestaurantImage", "restaurantImage"],
         ["setAboutImage", "aboutImage"],
-        ["setAboutFloatImage", "aboutFloatImage"]
+        ["setAboutFloatImage", "aboutFloatImage"],
+        ["setLeisurePlayImage1", "leisurePlayImage1"],
+        ["setLeisurePlayImage2", "leisurePlayImage2"],
+        ["setLeisurePlayImage3", "leisurePlayImage3"],
+        ["setLeisurePlayImage4", "leisurePlayImage4"],
+        ["setLeisureSpaImage", "leisureSpaImage"]
       ];
 
       const payload = {
@@ -798,7 +819,11 @@ function wireSettingsPanel() {
         heroStat3Value: form.querySelector("#setStat3Value").value.trim(),
         heroStat3Label: form.querySelector("#setStat3Label").value.trim(),
         heroStat4Value: form.querySelector("#setStat4Value").value.trim(),
-        heroStat4Label: form.querySelector("#setStat4Label").value.trim()
+        heroStat4Label: form.querySelector("#setStat4Label").value.trim(),
+        leisurePlayTitle: form.querySelector("#setLeisurePlayTitle").value.trim(),
+        leisurePlayText: form.querySelector("#setLeisurePlayText").value.trim(),
+        leisureSpaTitle: form.querySelector("#setLeisureSpaTitle").value.trim(),
+        leisureSpaText: form.querySelector("#setLeisureSpaText").value.trim()
       };
 
       for (const [inputId, field] of imageFields) {
