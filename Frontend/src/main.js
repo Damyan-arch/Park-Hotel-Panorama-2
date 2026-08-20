@@ -393,7 +393,7 @@ function renderShell() {
         </div>
         <div class="topbar-right">
           <div class="topbar-links">
-            <a href="#restaurant">${t("info.restaurantHours")}: ${escapeHtml(state.settings.restaurantHoursDays)}, ${escapeHtml(state.settings.restaurantHoursText)}</a>
+            <a href="#restaurant">${t("info.restaurantHours")}: ${escapeHtml(state.settings.restaurantHoursDays)}</a>
           </div>
           <div class="lang-switch" id="langSwitch">
             <button class="lang-current" id="langToggle" type="button" aria-haspopup="listbox">
@@ -486,7 +486,7 @@ function renderShell() {
           </div>
           <div class="info-item">
             <div class="icon-badge"><span class="material-symbols-outlined">restaurant</span></div>
-            <div><strong>${t("info.restaurantHours")}</strong><span>${escapeHtml(state.settings.restaurantHoursDays)} · ${escapeHtml(state.settings.restaurantHoursText)}</span></div>
+            <div><strong>${t("info.restaurantHours")}</strong><span>${escapeHtml(state.settings.restaurantHoursDays)}</span></div>
           </div>
         </div>
       </section>
@@ -586,7 +586,6 @@ function renderShell() {
           <div>
             <h3>${t("restaurant.workingHours")}</h3>
             <p>${escapeHtml(state.settings.restaurantHoursDays)}</p>
-            <p>${escapeHtml(state.settings.restaurantHoursText)}</p>
           </div>
         </div>
       </div>
@@ -703,7 +702,7 @@ function renderShell() {
             <ul>
               <li>${escapeHtml(state.settings.phoneNumber)}</li>
               <li>${escapeHtml(state.settings.address)}</li>
-              <li>${escapeHtml(state.settings.restaurantHoursDays)} · ${escapeHtml(state.settings.restaurantHoursText)}</li>
+              <li>${escapeHtml(state.settings.restaurantHoursDays)}</li>
             </ul>
           </div>
         </div>
