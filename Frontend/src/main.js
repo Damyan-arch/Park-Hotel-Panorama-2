@@ -20,7 +20,7 @@ const LOCALE_MAP = { en: "en-US", bg: "bg-BG", de: "de-DE", es: "es-ES", ro: "ro
 
 const I18N = {
   en: {
-    "nav.home": "Home", "nav.about": "About", "nav.rooms": "Rooms", "nav.restaurant": "Restaurant",
+    "nav.home": "Home", "nav.about": "About", "nav.leisure": "Leisure", "nav.rooms": "Rooms", "nav.restaurant": "Restaurant",
     "nav.gallery": "Gallery", "nav.location": "Location",
     "nav.callUs": "Call Us", "nav.bookNow": "Book Now",
     "hero.eyebrow": "Boutique Mountain Retreat · Tryavna",
@@ -35,6 +35,11 @@ const I18N = {
     "about.point1": "Serene atmosphere & attentive service", "about.point2": "Well-appointed rooms with mountain views",
     "about.point3": "Regional design charm throughout", "about.seeLocation": "See Location",
     "amenities.eyebrow": "Things To Do", "amenities.title": "Everything the Balkans have to offer",
+    "leisure.eyebrow": "Family & Leisure", "leisure.title": "Space to Play, Space to Unwind",
+    "leisure.playTitle": "Kids' Adventure Playground",
+    "leisure.playText": "A colorful outdoor playground built for adventure — climbing frames, rope courses and hanging hammock swings set right in the garden. There's also an open field for football and running around, so kids stay active and entertained while parents relax nearby.",
+    "leisure.spaTitle": "Sunset Hot Tub",
+    "leisure.spaText": "End the day the right way — soak in our outdoor hot tub as the sun sets behind the Balkan Mountains, glass of something sparkling in hand. A quiet, private way to unwind after a day of hiking or exploring Tryavna.",
     "amenities.subtitle": "From vineyard afternoons to mountain-trail mornings, our team can arrange it all — just ask at the front desk.",
     "rooms.eyebrow": "Stay With Us", "rooms.title": "Rooms & Suites",
     "rooms.subtitle": "Four room types, each with balcony access and views over Tryavna — book directly for the best rate.",
@@ -67,7 +72,7 @@ const I18N = {
     "events.widgetTitle": "Upcoming Events", "events.seeMore": "See More Information"
   },
   bg: {
-    "nav.home": "Начало", "nav.about": "За нас", "nav.rooms": "Стаи", "nav.restaurant": "Ресторант",
+    "nav.home": "Начало", "nav.about": "За нас", "nav.leisure": "Отдих", "nav.rooms": "Стаи", "nav.restaurant": "Ресторант",
     "nav.gallery": "Галерия", "nav.location": "Локация",
     "nav.callUs": "Обадете се", "nav.bookNow": "Резервирай",
     "hero.eyebrow": "Бутиков планински хотел · Трявна",
@@ -82,6 +87,11 @@ const I18N = {
     "about.point1": "Спокойна атмосфера и внимателно обслужване", "about.point2": "Уютни стаи с изглед към планината",
     "about.point3": "Регионален чар във всеки детайл", "about.seeLocation": "Виж локацията",
     "amenities.eyebrow": "Забавления", "amenities.title": "Всичко, което Балканът предлага",
+    "leisure.eyebrow": "Семейство и отдих", "leisure.title": "Място за игри, място за отдих",
+    "leisure.playTitle": "Детска площадка за приключения",
+    "leisure.playText": "Цветна детска площадка на открито, създадена за приключения — съоръжения за катерене, въжени препятствия и висящи люлки-хамаци, разположени точно в градината. Има и открито игрище за футбол и тичане, така че децата да останат активни и забавлявани, докато родителите си почиват наблизо.",
+    "leisure.spaTitle": "Джакузи „Залез“",
+    "leisure.spaText": "Завършете деня по най-добрия начин — отпуснете се в нашата джакузи на открито, докато слънцето залязва зад Стара планина, с чаша пенливо питие в ръка. Тих и уединен начин да се отпуснете след ден, прекаран в разходки или опознаване на Трявна.",
     "amenities.subtitle": "От следобеди в лозя до сутрини по планински пътеки — нашият екип може да организира всичко, просто попитайте на рецепцията.",
     "rooms.eyebrow": "Отседнете при нас", "rooms.title": "Стаи и апартаменти",
     "rooms.subtitle": "Четири вида стаи, всяка с балкон и изглед към Трявна — резервирайте директно за най-добра цена.",
@@ -114,7 +124,7 @@ const I18N = {
     "events.widgetTitle": "Предстоящи събития", "events.seeMore": "Вижте повече информация"
   },
   de: {
-    "nav.home": "Startseite", "nav.about": "Über uns", "nav.rooms": "Zimmer", "nav.restaurant": "Restaurant",
+    "nav.home": "Startseite", "nav.about": "Über uns", "nav.leisure": "Freizeit", "nav.rooms": "Zimmer", "nav.restaurant": "Restaurant",
     "nav.gallery": "Galerie", "nav.location": "Lage",
     "nav.callUs": "Anrufen", "nav.bookNow": "Jetzt buchen",
     "hero.eyebrow": "Boutique-Berghotel · Tryavna",
@@ -129,6 +139,11 @@ const I18N = {
     "about.point1": "Ruhige Atmosphäre & aufmerksamer Service", "about.point2": "Gepflegte Zimmer mit Bergblick",
     "about.point3": "Regionaler Charme in jedem Detail", "about.seeLocation": "Lage ansehen",
     "amenities.eyebrow": "Unternehmungen", "amenities.title": "Alles, was der Balkan zu bieten hat",
+    "leisure.eyebrow": "Familie & Freizeit", "leisure.title": "Platz zum Spielen, Platz zum Entspannen",
+    "leisure.playTitle": "Abenteuerspielplatz für Kinder",
+    "leisure.playText": "Ein farbenfroher Spielplatz im Freien, der zum Erleben von Abenteuern einlädt – Klettergerüste, Seilparcours und Hängeschaukeln direkt im Garten. Außerdem gibt es eine große Wiese zum Fußballspielen und Herumtollen, sodass die Kinder aktiv bleiben und Spaß haben, während sich die Eltern in der Nähe entspannen können.",
+    "leisure.spaTitle": "Whirlpool bei Sonnenuntergang",
+    "leisure.spaText": "Lassen Sie den Tag gebührend ausklingen – entspannen Sie sich in unserem Whirlpool im Freien, während die Sonne hinter dem Balkangebirge untergeht, und genießen Sie dabei ein Glas Sekt. Eine ruhige, ungestörte Art, nach einem Tag voller Wanderungen oder Erkundungstouren durch Tryavna die Seele baumeln zu lassen.",
     "amenities.subtitle": "Von Nachmittagen im Weinberg bis zu Wandermorgen — unser Team organisiert alles, fragen Sie einfach an der Rezeption.",
     "rooms.eyebrow": "Bei uns übernachten", "rooms.title": "Zimmer & Suiten",
     "rooms.subtitle": "Vier Zimmertypen, jedes mit Balkon und Blick über Tryavna — buchen Sie direkt für den besten Preis.",
@@ -161,7 +176,7 @@ const I18N = {
     "events.widgetTitle": "Kommende Veranstaltungen", "events.seeMore": "Weitere Informationen"
   },
   es: {
-    "nav.home": "Inicio", "nav.about": "Sobre nosotros", "nav.rooms": "Habitaciones", "nav.restaurant": "Restaurante",
+    "nav.home": "Inicio", "nav.about": "Sobre nosotros", "nav.leisure": "Ocio", "nav.rooms": "Habitaciones", "nav.restaurant": "Restaurante",
     "nav.gallery": "Galería", "nav.location": "Ubicación",
     "nav.callUs": "Llámanos", "nav.bookNow": "Reservar",
     "hero.eyebrow": "Retiro de montaña boutique · Tryavna",
@@ -176,6 +191,11 @@ const I18N = {
     "about.point1": "Ambiente sereno y servicio atento", "about.point2": "Habitaciones bien equipadas con vistas a la montaña",
     "about.point3": "Encanto regional en cada detalle", "about.seeLocation": "Ver ubicación",
     "amenities.eyebrow": "Qué hacer", "amenities.title": "Todo lo que ofrecen los Balcanes",
+    "leisure.eyebrow": "Familia y ocio", "leisure.title": "Espacio para jugar, espacio para relajarse",
+    "leisure.playTitle": "Parque infantil de aventuras",
+    "leisure.playText": "Un colorido parque infantil al aire libre diseñado para la aventura: estructuras para trepar, circuitos de cuerdas y columpios de hamaca colgantes, todo ello en pleno jardín. También hay un campo abierto para jugar al fútbol y correr, de modo que los niños se mantienen activos y entretenidos mientras los padres se relajan cerca.",
+    "leisure.spaTitle": "Jacuzzi al atardecer",
+    "leisure.spaText": "Termina el día como es debido: relájate en nuestro jacuzzi al aire libre mientras el sol se pone tras las montañas de los Balcanes, con una copa de algo espumoso en la mano. Una forma tranquila y privada de desconectar tras un día de senderismo o de explorar Tryavna.",
     "amenities.subtitle": "Desde tardes de viñedo hasta mañanas de senderismo, nuestro equipo puede organizarlo todo — solo pregunte en recepción.",
     "rooms.eyebrow": "Alójese con nosotros", "rooms.title": "Habitaciones y suites",
     "rooms.subtitle": "Cuatro tipos de habitación, todas con balcón y vistas a Tryavna — reserve directamente para la mejor tarifa.",
@@ -208,7 +228,7 @@ const I18N = {
     "events.widgetTitle": "Próximos Eventos", "events.seeMore": "Ver Más Información"
   },
   ro: {
-    "nav.home": "Acasă", "nav.about": "Despre noi", "nav.rooms": "Camere", "nav.restaurant": "Restaurant",
+    "nav.home": "Acasă", "nav.about": "Despre noi", "nav.leisure": "Timp liber", "nav.rooms": "Camere", "nav.restaurant": "Restaurant",
     "nav.gallery": "Galerie", "nav.location": "Locație",
     "nav.callUs": "Sună-ne", "nav.bookNow": "Rezervă acum",
     "hero.eyebrow": "Refugiu montan boutique · Tryavna",
@@ -223,6 +243,11 @@ const I18N = {
     "about.point1": "Atmosferă senină și serviciu atent", "about.point2": "Camere bine amenajate cu vedere la munte",
     "about.point3": "Farmec regional în fiecare detaliu", "about.seeLocation": "Vezi locația",
     "amenities.eyebrow": "Ce poți face", "amenities.title": "Tot ce au de oferit Balcanii",
+    "leisure.eyebrow": "Familie și timp liber", "leisure.title": "Un spațiu pentru joacă, un spațiu pentru relaxare",
+    "leisure.playTitle": "Teren de joacă de aventură pentru copii",
+    "leisure.playText": "Un loc de joacă în aer liber, plin de culoare, conceput pentru aventură — structuri de cățărare, trasee cu frânghii și leagăne suspendate sub formă de hamac, amplasate chiar în grădină. Există, de asemenea, un teren deschis pentru fotbal și alergat, astfel încât copiii să rămână activi și distrați, în timp ce părinții se relaxează în apropiere.",
+    "leisure.spaTitle": "Jacuzzi la apus de soare",
+    "leisure.spaText": "Încheiați ziua așa cum se cuvine — relaxați-vă în jacuzzi-ul nostru în aer liber, în timp ce soarele apune în spatele Munților Balcani, cu un pahar de băutură spumoasă în mână. O modalitate liniștită și intimă de a vă relaxa după o zi de drumeții sau de explorare a orașului Tryavna.",
     "amenities.subtitle": "De la după-amiezi la cramă la dimineți pe traseele montane, echipa noastră poate organiza totul — întrebați la recepție.",
     "rooms.eyebrow": "Stați cu noi", "rooms.title": "Camere și apartamente",
     "rooms.subtitle": "Patru tipuri de camere, fiecare cu balcon și vedere spre Tryavna — rezervați direct pentru cel mai bun preț.",
@@ -280,13 +305,22 @@ const FALLBACK_SETTINGS = {
   heroStat3Value: "< 2h",
   heroStat3Label: "",
   heroStat4Value: "5★",
-  heroStat4Label: ""
+  heroStat4Label: "",
+  leisurePlayTitle: "",
+  leisurePlayText: "",
+  leisureSpaTitle: "",
+  leisureSpaText: "",
+  leisurePlayImage1: "/images/leisure/playground-1.webp",
+  leisurePlayImage2: "/images/leisure/playground-2.webp",
+  leisurePlayImage3: "/images/leisure/playground-3.webp",
+  leisurePlayImage4: "/images/leisure/kids-football.webp",
+  leisureSpaImage: "/images/leisure/hot-tub.webp"
 };
 
 const FALLBACK_AMENITIES = [];
 
 let state = {
-  lang: localStorage.getItem("php_lang") || "en",
+  lang: localStorage.getItem("php_lang") || "bg",
   settings: FALLBACK_SETTINGS,
   amenities: FALLBACK_AMENITIES,
   rooms: [],
@@ -388,6 +422,7 @@ function renderShell() {
         <nav class="main-nav" id="mainNav">
           <a href="#home">${t("nav.home")}</a>
           <a href="#about">${t("nav.about")}</a>
+          <a href="#leisure">${t("nav.leisure")}</a>
           <a href="#rooms">${t("nav.rooms")}</a>
           <a href="#restaurant">${t("nav.restaurant")}</a>
           <a href="#gallery">${t("nav.gallery")}</a>
@@ -403,6 +438,17 @@ function renderShell() {
             <span class="material-symbols-outlined">menu</span>
           </button>
         </div>
+      </div>
+      <a href="#home" class="brand brand-pinned">
+        <img src="/images/brand/logo-mark-v2.png" alt="Park Hotel Panorama logo" />
+        <span>Park Hotel Panorama<small>Tryavna, Bulgaria</small></span>
+      </a>
+      <div class="nav-actions-pinned">
+        <a class="nav-call" href="tel:+359897820065">
+          <span class="material-symbols-outlined">call</span>
+          <span class="label">${t("nav.callUs")}</span>
+        </a>
+        <a class="btn btn-line" href="#booking">${t("nav.bookNow")}</a>
       </div>
     </header>
 
@@ -473,6 +519,38 @@ function renderShell() {
             <p>${t("amenities.subtitle")}</p>
           </div>
           <div class="amenity-grid" id="amenityGrid"></div>
+        </div>
+      </section>
+
+      <section class="leisure" id="leisure">
+        <div class="container">
+          <div class="section-head center">
+            <div class="eyebrow">${t("leisure.eyebrow")}</div>
+            <h2>${t("leisure.title")}</h2>
+          </div>
+
+          <div class="leisure-block">
+            <div class="leisure-media leisure-grid">
+              <img src="${mediaUrl(state.settings.leisurePlayImage1)}" alt="Kids' adventure playground" loading="lazy" />
+              <img src="${mediaUrl(state.settings.leisurePlayImage2)}" alt="Kids' adventure playground" loading="lazy" />
+              <img src="${mediaUrl(state.settings.leisurePlayImage3)}" alt="Kids' adventure playground" loading="lazy" />
+              <img src="${mediaUrl(state.settings.leisurePlayImage4)}" alt="Kids playing football" loading="lazy" />
+            </div>
+            <div class="leisure-copy">
+              <h3>${tOrSetting("leisure.playTitle", state.settings.leisurePlayTitle)}</h3>
+              <p>${tOrSetting("leisure.playText", state.settings.leisurePlayText)}</p>
+            </div>
+          </div>
+
+          <div class="leisure-block reverse">
+            <div class="leisure-media single">
+              <img src="${mediaUrl(state.settings.leisureSpaImage)}" alt="Outdoor hot tub at sunset" loading="lazy" />
+            </div>
+            <div class="leisure-copy">
+              <h3>${tOrSetting("leisure.spaTitle", state.settings.leisureSpaTitle)}</h3>
+              <p>${tOrSetting("leisure.spaText", state.settings.leisureSpaText)}</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -613,6 +691,7 @@ function renderShell() {
             <h4>${t("footer.explore")}</h4>
             <ul>
               <li><a href="#about">${t("nav.about")}</a></li>
+              <li><a href="#leisure">${t("nav.leisure")}</a></li>
               <li><a href="#rooms">${t("nav.rooms")}</a></li>
               <li><a href="#restaurant">${t("nav.restaurant")}</a></li>
               <li><a href="#gallery">${t("nav.gallery")}</a></li>
@@ -1084,10 +1163,25 @@ function wireLangSwitch() {
   });
 }
 
+// The events widget is fixed to the viewport, so once the page has more
+// sections below the hero, whatever happens to scroll under it can get
+// covered. Only show it while the hero is in view instead of at all times.
+function wireEventsWidgetVisibility() {
+  const widget = document.querySelector(".events-widget");
+  const hero = document.getElementById("home");
+  if (!widget || !hero) return;
+
+  const observer = new IntersectionObserver(([entry]) => widget.classList.toggle("is-hidden", !entry.isIntersecting), {
+    threshold: 0.15
+  });
+  observer.observe(hero);
+}
+
 function renderAll() {
   renderShell();
   wireNav();
   wireLangSwitch();
+  wireEventsWidgetVisibility();
   renderAmenities();
   renderRooms();
   renderGallery();

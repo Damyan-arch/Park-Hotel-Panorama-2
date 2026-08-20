@@ -1,5 +1,5 @@
 const API_BASE = "/api";
-const lang = localStorage.getItem("php_lang") || "en";
+const lang = localStorage.getItem("php_lang") || "bg";
 
 function pickLocalized(value) {
   if (value == null) return "";

@@ -12,9 +12,6 @@ const sharp = require("sharp");
 const store = require("./data/store");
 const translate = require("./services/translate");
 
-// Disable sharp's internal input-file cache — without this, re-processing a
-// path sharp has already read can hold that file handle open (observed as
-// EPERM/UNKNOWN errors writing back to the same path on Windows).
 sharp.cache(false);
 
 const PORT = process.env.PORT || 3002;
@@ -22,7 +19,10 @@ const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGIN || "http://localhost:4202"
   .split(",")
   .map((s) => s.trim())
   .concat([`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`]);
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "damian.tsvetkov@hermeses.com").toLowerCase();
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "damian.tsvetkov@hermeses.com,ganka.orh@gmail.com")
+  .split(",")
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Lumen-Balkan-2179%";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
@@ -32,15 +32,11 @@ app.use(
     origin(origin, callback) {
       if (!origin) return callback(null, true); // same-origin / non-browser requests
       if (FRONTEND_ORIGINS.includes(origin)) return callback(null, true);
-      // Allow ad-hoc devtunnel preview links (e.g. sharing the site with a client)
-      // without needing to hardcode a random tunnel id in FRONTEND_ORIGIN.
       try {
         if (/\.devtunnels\.ms$/.test(new URL(origin).hostname)) return callback(null, true);
       } catch {
         // ignore malformed origin header
       }
-      // Reject without throwing — an uncaught error here would 500 every
-      // request (including this server's own same-origin asset requests).
       return callback(null, false);
     }
   })
@@ -48,20 +44,10 @@ app.use(
 app.use(compression());
 app.use(express.json());
 
-// Images are admin-editable (uploads can replace a file without changing its
-// name), so cache for a day and let ETag revalidation catch changes in between.
 app.use("/images", express.static(path.join(__dirname, "public/images"), { maxAge: "1d" }));
 
-// Serve the built frontend (Frontend/dist, produced by `npm run build`) from this
-// same server/port, so the whole site — including /admin — can be shared behind a
-// single tunnel link instead of forwarding the frontend and backend separately.
 const FRONTEND_DIST = path.join(__dirname, "../Frontend/dist");
 
-// /assets/* filenames are content-hashed by Vite (e.g. main-7Z3AMQnb.js) — a
-// rebuild produces new filenames rather than changing these bytes, so it's safe
-// to cache them indefinitely. index.html / admin/index.html keep the same URL
-// across rebuilds, so they're served below with the default (no long cache),
-// or every deploy would keep serving a stale HTML shell for a year.
 app.use("/assets", express.static(path.join(FRONTEND_DIST, "assets"), { maxAge: "1y", immutable: true }));
 app.use(express.static(FRONTEND_DIST));
 
@@ -201,7 +187,7 @@ app.post("/api/bookings", (req, res) => {
 app.post("/api/admin/login", (req, res) => {
   const { email, password } = req.body || {};
 
-  if (!email || email.trim().toLowerCase() !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+  if (!email || !ADMIN_EMAILS.includes(email.trim().toLowerCase()) || password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Invalid email or password." });
   }
 

@@ -23,7 +23,16 @@
     "heroStat3Value": "< 2h",
     "heroStat3Label": "",
     "heroStat4Value": "5★",
-    "heroStat4Label": ""
+    "heroStat4Label": "",
+    "leisurePlayTitle": "",
+    "leisurePlayText": "",
+    "leisureSpaTitle": "",
+    "leisureSpaText": "",
+    "leisurePlayImage1": "/images/leisure/playground-1.webp",
+    "leisurePlayImage2": "/images/leisure/playground-2.webp",
+    "leisurePlayImage3": "/images/leisure/playground-3.webp",
+    "leisurePlayImage4": "/images/leisure/kids-football.webp",
+    "leisureSpaImage": "/images/leisure/hot-tub.webp"
   },
   "rooms": [
     {

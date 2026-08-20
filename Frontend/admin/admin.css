@@ -593,10 +593,8 @@ input {
 
 /* ---------- Settings form ---------- */
 .settings-form {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  align-items: start;
+  column-count: 2;
+  column-gap: 20px;
   width: 90vw;
   max-width: 1600px;
   position: relative;
@@ -610,6 +608,8 @@ input {
   border-radius: var(--radius-lg);
   padding: 24px 26px;
   box-shadow: var(--shadow-card);
+  break-inside: avoid;
+  margin-bottom: 20px;
 }
 
 .settings-form h4 {
@@ -620,14 +620,14 @@ input {
 }
 
 .settings-actions {
-  grid-column: 1 / -1;
+  column-span: all;
   display: flex;
   align-items: center;
 }
 
 @media (max-width: 900px) {
   .settings-form {
-    grid-template-columns: 1fr;
+    column-count: 1;
   }
 }
 

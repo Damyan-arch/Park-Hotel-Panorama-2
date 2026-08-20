@@ -375,6 +375,54 @@ nav.main-nav a:hover::after {
   white-space: nowrap;
 }
 
+/* The visible Call Us / Book Now controls on desktop are the pinned copy
+   below — .nav-actions stays in the flex flow (so .brand/.main-nav never
+   reflow) but is invisible there; on mobile it's the only copy shown. */
+.nav-actions-pinned {
+  display: none;
+}
+
+.brand-pinned {
+  display: none;
+}
+
+@media (min-width: 1081px) {
+  .brand:not(.brand-pinned) {
+    visibility: hidden;
+  }
+
+  .brand-pinned {
+    display: flex;
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 24px;
+    height: 82px;
+    z-index: 60;
+  }
+
+  .nav-actions {
+    visibility: hidden;
+  }
+
+  .nav-actions-pinned {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    /* Positioned relative to header.site-header (a sticky, thus positioned,
+       ancestor) rather than position:fixed to the viewport — fixed would
+       anchor to the raw viewport top, ignoring the topbar above the header
+       and landing this out of place before the header has scrolled up
+       under it. Absolute-inside-sticky tracks the header's real box in
+       every scroll state instead. */
+    position: absolute;
+    top: 0;
+    right: 24px;
+    height: 82px;
+    z-index: 60;
+  }
+}
+
 .nav-row {
   flex-wrap: nowrap;
   gap: 12px;
@@ -662,6 +710,91 @@ nav.main-nav a:hover::after {
   }
   .about-media .float-shot {
     display: none;
+  }
+}
+
+/* ---------- Leisure ---------- */
+.leisure {
+  background: var(--cream-100);
+}
+
+.leisure-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.leisure-block + .leisure-block {
+  margin-top: 72px;
+}
+
+.leisure-block.reverse .leisure-media {
+  order: 2;
+}
+
+.leisure-block.reverse .leisure-copy {
+  order: 1;
+}
+
+.leisure-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.leisure-grid img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.leisure-media.single {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  aspect-ratio: 4 / 3;
+}
+
+.leisure-media.single img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.leisure-copy h3 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--pine-900);
+  margin: 0 0 16px;
+}
+
+.leisure-copy p {
+  color: var(--ink-600);
+  line-height: 1.8;
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .leisure-block,
+  .leisure-block.reverse .leisure-media,
+  .leisure-block.reverse .leisure-copy {
+    grid-template-columns: 1fr;
+    order: initial;
+  }
+  .leisure-block {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .leisure-block + .leisure-block {
+    margin-top: 48px;
+  }
+  .leisure-grid img {
+    height: 120px;
   }
 }
 
@@ -1340,6 +1473,14 @@ footer.site-footer {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   padding: 20px;
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.events-widget.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(24px);
 }
 
 .events-widget-head {
