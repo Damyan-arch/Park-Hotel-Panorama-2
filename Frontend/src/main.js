@@ -41,6 +41,7 @@ const I18N = {
     "leisure.spaTitle": "Sunset Hot Tub",
     "leisure.spaText": "End the day the right way — soak in our outdoor hot tub as the sun sets behind the Balkan Mountains, glass of something sparkling in hand. A quiet, private way to unwind after a day of hiking or exploring Tryavna.",
     "amenities.subtitle": "From vineyard afternoons to mountain-trail mornings, our team can arrange it all — just ask at the front desk.",
+    "amenities.underMaintenance": "Under Maintenance",
     "rooms.eyebrow": "Stay With Us", "rooms.title": "Rooms & Suites",
     "rooms.subtitle": "Four room types, each with balcony access and views over Tryavna — book directly for the best rate.",
     "rooms.guests": "guests", "rooms.perNight": "/ night", "rooms.inquire": "Inquire",
@@ -93,6 +94,7 @@ const I18N = {
     "leisure.spaTitle": "Джакузи „Залез“",
     "leisure.spaText": "Завършете деня по най-добрия начин — отпуснете се в нашата джакузи на открито, докато слънцето залязва зад Стара планина, с чаша пенливо питие в ръка. Тих и уединен начин да се отпуснете след ден, прекаран в разходки или опознаване на Трявна.",
     "amenities.subtitle": "От следобеди в лозя до сутрини по планински пътеки — нашият екип може да организира всичко, просто попитайте на рецепцията.",
+    "amenities.underMaintenance": "В процес на поддръжка",
     "rooms.eyebrow": "Отседнете при нас", "rooms.title": "Стаи и апартаменти",
     "rooms.subtitle": "Четири вида стаи, всяка с балкон и изглед към Трявна — резервирайте директно за най-добра цена.",
     "rooms.guests": "гости", "rooms.perNight": "/ нощ", "rooms.inquire": "Запитване",
@@ -145,6 +147,7 @@ const I18N = {
     "leisure.spaTitle": "Whirlpool bei Sonnenuntergang",
     "leisure.spaText": "Lassen Sie den Tag gebührend ausklingen – entspannen Sie sich in unserem Whirlpool im Freien, während die Sonne hinter dem Balkangebirge untergeht, und genießen Sie dabei ein Glas Sekt. Eine ruhige, ungestörte Art, nach einem Tag voller Wanderungen oder Erkundungstouren durch Tryavna die Seele baumeln zu lassen.",
     "amenities.subtitle": "Von Nachmittagen im Weinberg bis zu Wandermorgen — unser Team organisiert alles, fragen Sie einfach an der Rezeption.",
+    "amenities.underMaintenance": "Wartungsarbeiten",
     "rooms.eyebrow": "Bei uns übernachten", "rooms.title": "Zimmer & Suiten",
     "rooms.subtitle": "Vier Zimmertypen, jedes mit Balkon und Blick über Tryavna — buchen Sie direkt für den besten Preis.",
     "rooms.guests": "Gäste", "rooms.perNight": "/ Nacht", "rooms.inquire": "Anfragen",
@@ -197,6 +200,7 @@ const I18N = {
     "leisure.spaTitle": "Jacuzzi al atardecer",
     "leisure.spaText": "Termina el día como es debido: relájate en nuestro jacuzzi al aire libre mientras el sol se pone tras las montañas de los Balcanes, con una copa de algo espumoso en la mano. Una forma tranquila y privada de desconectar tras un día de senderismo o de explorar Tryavna.",
     "amenities.subtitle": "Desde tardes de viñedo hasta mañanas de senderismo, nuestro equipo puede organizarlo todo — solo pregunte en recepción.",
+    "amenities.underMaintenance": "En mantenimiento",
     "rooms.eyebrow": "Alójese con nosotros", "rooms.title": "Habitaciones y suites",
     "rooms.subtitle": "Cuatro tipos de habitación, todas con balcón y vistas a Tryavna — reserve directamente para la mejor tarifa.",
     "rooms.guests": "huéspedes", "rooms.perNight": "/ noche", "rooms.inquire": "Consultar",
@@ -249,6 +253,7 @@ const I18N = {
     "leisure.spaTitle": "Jacuzzi la apus de soare",
     "leisure.spaText": "Încheiați ziua așa cum se cuvine — relaxați-vă în jacuzzi-ul nostru în aer liber, în timp ce soarele apune în spatele Munților Balcani, cu un pahar de băutură spumoasă în mână. O modalitate liniștită și intimă de a vă relaxa după o zi de drumeții sau de explorare a orașului Tryavna.",
     "amenities.subtitle": "De la după-amiezi la cramă la dimineți pe traseele montane, echipa noastră poate organiza totul — întrebați la recepție.",
+    "amenities.underMaintenance": "În curs de întreținere",
     "rooms.eyebrow": "Stați cu noi", "rooms.title": "Camere și apartamente",
     "rooms.subtitle": "Patru tipuri de camere, fiecare cu balcon și vedere spre Tryavna — rezervați direct pentru cel mai bun preț.",
     "rooms.guests": "oaspeți", "rooms.perNight": "/ noapte", "rooms.inquire": "Întreabă",
@@ -762,7 +767,8 @@ function renderAmenities() {
   grid.innerHTML = state.amenities
     .map(
       (a) => `
-      <div class="amenity-card">
+      <div class="amenity-card${a.underMaintenance ? " is-maintenance" : ""}">
+        ${a.underMaintenance ? `<span class="amenity-tag">${t("amenities.underMaintenance")}</span>` : ""}
         <div class="icon-badge"><span class="material-symbols-outlined">${a.icon}</span></div>
         <h3>${escapeHtml(pickLocalized(a.title, state.lang))}</h3>
         <p>${escapeHtml(pickLocalized(a.text, state.lang))}</p>

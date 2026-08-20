@@ -823,11 +823,30 @@ nav.main-nav a:hover::after {
 }
 
 .amenity-card {
+  position: relative;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: var(--radius-md);
   padding: 30px 26px;
   transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.amenity-card.is-maintenance {
+  opacity: 0.6;
+}
+
+.amenity-tag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(201, 162, 75, 0.16);
+  color: var(--gold-400);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 .amenity-card:hover {
