@@ -9,6 +9,7 @@ const multer = require("multer");
 const compression = require("compression");
 const sharp = require("sharp");
 
+const { AppDataSource } = require("./data/data-source");
 const store = require("./data/store");
 const translate = require("./services/translate");
 
@@ -51,8 +52,6 @@ const FRONTEND_DIST = path.join(__dirname, "../Frontend/dist");
 app.use("/assets", express.static(path.join(FRONTEND_DIST, "assets"), { maxAge: "1y", immutable: true }));
 app.use(express.static(FRONTEND_DIST));
 
-const inquiries = [];
-const bookings = [];
 const adminSessions = new Map(); // token -> expiresAt
 
 function issueToken() {
@@ -95,46 +94,43 @@ app.get("/api", (_req, res) => {
   res.json({ message: "Park Hotel Panorama API", status: "ok" });
 });
 
-app.get("/api/settings", (_req, res) => {
-  res.json(store.getSettings());
+app.get("/api/settings", async (_req, res) => {
+  res.json(await store.getSettings());
 });
 
-app.get("/api/rooms", (_req, res) => {
-  res.json(store.getRooms());
+app.get("/api/rooms", async (_req, res) => {
+  res.json(await store.getRooms());
 });
 
-app.get("/api/amenities", (_req, res) => {
-  res.json(store.getAmenities());
+app.get("/api/amenities", async (_req, res) => {
+  res.json(await store.getAmenities());
 });
 
-app.get("/api/gallery", (_req, res) => {
-  res.json([...store.getGallery()].sort((a, b) => a.sortOrder - b.sortOrder));
+app.get("/api/gallery", async (_req, res) => {
+  res.json((await store.getGallery()).sort((a, b) => a.sortOrder - b.sortOrder));
 });
 
-app.get("/api/events", (_req, res) => {
-  res.json([...store.getEvents()].sort((a, b) => new Date(a.date) - new Date(b.date)));
+app.get("/api/events", async (_req, res) => {
+  res.json((await store.getEvents()).sort((a, b) => new Date(a.date) - new Date(b.date)));
 });
 
 /* ---------- Public form submissions ---------- */
 
-app.post("/api/contact", (req, res) => {
+app.post("/api/contact", async (req, res) => {
   const { name, email, phone, message, roomName } = req.body || {};
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: "Name, email and message are required." });
   }
 
-  const inquiry = {
-    id: inquiries.length + 1,
+  const inquiry = await store.addInquiry({
     name,
     email,
     phone: phone || null,
     roomName: roomName || null,
     message,
-    status: "new",
-    receivedAt: new Date().toISOString()
-  };
-  inquiries.push(inquiry);
+    status: "new"
+  });
 
   console.log("New inquiry received:", inquiry);
 
@@ -144,7 +140,7 @@ app.post("/api/contact", (req, res) => {
   });
 });
 
-app.post("/api/bookings", (req, res) => {
+app.post("/api/bookings", async (req, res) => {
   const { roomId, roomName, checkIn, checkOut, name, email, phone } = req.body || {};
 
   if (!roomId || !checkIn || !checkOut || !name || !email) {
@@ -155,30 +151,29 @@ app.post("/api/bookings", (req, res) => {
     return res.status(400).json({ error: "Check-out date must be after check-in date." });
   }
 
-  const room = store.getRooms().find((r) => r.id === roomId);
+  const rooms = await store.getRooms();
+  const room = rooms.find((r) => r.id === roomId);
   if (!room) {
     return res.status(400).json({ error: "Selected room could not be found." });
   }
 
-  const booking = {
-    id: bookings.length + 1,
+  const bookingRoomName = roomName || room.name;
+  const booking = await store.addBooking({
     roomId,
-    roomName: roomName || room.name,
+    roomName: bookingRoomName,
     checkIn,
     checkOut,
     name,
     email,
     phone: phone || null,
-    status: "new",
-    receivedAt: new Date().toISOString()
-  };
-  bookings.push(booking);
+    status: "new"
+  });
 
   console.log("New booking request:", booking);
 
   res.status(201).json({
     success: true,
-    message: `Thank you, ${name}! Your request for the ${booking.roomName} has been received — we'll confirm availability shortly.`
+    message: `Thank you, ${name}! Your request for the ${bookingRoomName} has been received — we'll confirm availability shortly.`
   });
 });
 
@@ -202,25 +197,25 @@ app.post("/api/admin/logout", requireAdmin, (req, res) => {
 
 /* ---------- Admin: leads ---------- */
 
-app.get("/api/admin/bookings", requireAdmin, (_req, res) => {
-  res.json([...bookings].reverse());
+app.get("/api/admin/bookings", requireAdmin, async (_req, res) => {
+  res.json(await store.getBookings());
 });
 
-app.get("/api/admin/inquiries", requireAdmin, (_req, res) => {
-  res.json([...inquiries].reverse());
+app.get("/api/admin/inquiries", requireAdmin, async (_req, res) => {
+  res.json(await store.getInquiries());
 });
 
-app.patch("/api/admin/bookings/:id", requireAdmin, (req, res) => {
-  const booking = bookings.find((b) => b.id === Number(req.params.id));
+app.patch("/api/admin/bookings/:id", requireAdmin, async (req, res) => {
+  if (!req.body?.status) return res.status(400).json({ error: "Status is required." });
+  const booking = await store.updateBookingStatus(Number(req.params.id), req.body.status);
   if (!booking) return res.status(404).json({ error: "Booking not found." });
-  if (req.body?.status) booking.status = req.body.status;
   res.json(booking);
 });
 
-app.patch("/api/admin/inquiries/:id", requireAdmin, (req, res) => {
-  const inquiry = inquiries.find((i) => i.id === Number(req.params.id));
+app.patch("/api/admin/inquiries/:id", requireAdmin, async (req, res) => {
+  if (!req.body?.status) return res.status(400).json({ error: "Status is required." });
+  const inquiry = await store.updateInquiryStatus(Number(req.params.id), req.body.status);
   if (!inquiry) return res.status(404).json({ error: "Inquiry not found." });
-  if (req.body?.status) inquiry.status = req.body.status;
   res.json(inquiry);
 });
 
@@ -257,8 +252,8 @@ app.post("/api/admin/upload", requireAdmin, (req, res) => {
 
 /* ---------- Admin: settings (Hotel Info) ---------- */
 
-app.put("/api/admin/settings", requireAdmin, (req, res) => {
-  res.json(store.updateSettings(req.body || {}));
+app.put("/api/admin/settings", requireAdmin, async (req, res) => {
+  res.json(await store.updateSettings(req.body || {}));
 });
 
 /* ---------- Admin: rooms ---------- */
@@ -287,11 +282,11 @@ app.post("/api/admin/rooms", requireAdmin, async (req, res) => {
     imageUrl
   };
 
-  res.status(201).json(store.addRoom(room));
+  res.status(201).json(await store.addRoom(room));
 });
 
 app.put("/api/admin/rooms/:id", requireAdmin, async (req, res) => {
-  const existing = store.getRooms().find((r) => r.id === req.params.id);
+  const existing = (await store.getRooms()).find((r) => r.id === req.params.id);
   if (!existing) return res.status(404).json({ error: "Room not found." });
 
   const patch = { ...req.body };
@@ -303,20 +298,20 @@ app.put("/api/admin/rooms/:id", requireAdmin, async (req, res) => {
     patch.description = await translate.translateIfChanged(patch.description, existing.description);
   }
 
-  const room = store.updateRoom(req.params.id, patch);
+  const room = await store.updateRoom(req.params.id, patch);
   if (!room) return res.status(404).json({ error: "Room not found." });
   res.json(room);
 });
 
-app.delete("/api/admin/rooms/:id", requireAdmin, (req, res) => {
-  const removed = store.deleteRoom(req.params.id);
+app.delete("/api/admin/rooms/:id", requireAdmin, async (req, res) => {
+  const removed = await store.deleteRoom(req.params.id);
   if (!removed) return res.status(404).json({ error: "Room not found." });
   res.status(204).end();
 });
 
 /* ---------- Admin: gallery ---------- */
 
-app.post("/api/admin/gallery", requireAdmin, (req, res) => {
+app.post("/api/admin/gallery", requireAdmin, async (req, res) => {
   const { imageUrl, alt, sortOrder } = req.body || {};
   if (!imageUrl) return res.status(400).json({ error: "Image is required." });
 
@@ -324,23 +319,23 @@ app.post("/api/admin/gallery", requireAdmin, (req, res) => {
     id: crypto.randomUUID(),
     imageUrl,
     alt: alt || "",
-    sortOrder: Number.isFinite(Number(sortOrder)) ? Number(sortOrder) : store.getGallery().length
+    sortOrder: Number.isFinite(Number(sortOrder)) ? Number(sortOrder) : (await store.getGallery()).length
   };
 
-  res.status(201).json(store.addGalleryImage(image));
+  res.status(201).json(await store.addGalleryImage(image));
 });
 
-app.put("/api/admin/gallery/:id", requireAdmin, (req, res) => {
+app.put("/api/admin/gallery/:id", requireAdmin, async (req, res) => {
   const patch = { ...req.body };
   if (patch.sortOrder != null) patch.sortOrder = Number(patch.sortOrder);
 
-  const image = store.updateGalleryImage(req.params.id, patch);
+  const image = await store.updateGalleryImage(req.params.id, patch);
   if (!image) return res.status(404).json({ error: "Image not found." });
   res.json(image);
 });
 
-app.delete("/api/admin/gallery/:id", requireAdmin, (req, res) => {
-  const removed = store.deleteGalleryImage(req.params.id);
+app.delete("/api/admin/gallery/:id", requireAdmin, async (req, res) => {
+  const removed = await store.deleteGalleryImage(req.params.id);
   if (!removed) return res.status(404).json({ error: "Image not found." });
   res.status(204).end();
 });
@@ -357,24 +352,24 @@ app.post("/api/admin/amenities", requireAdmin, async (req, res) => {
   ]);
 
   const amenity = { id: crypto.randomUUID(), icon, title: titleI18n, text: textI18n };
-  res.status(201).json(store.addAmenity(amenity));
+  res.status(201).json(await store.addAmenity(amenity));
 });
 
 app.put("/api/admin/amenities/:id", requireAdmin, async (req, res) => {
-  const existing = store.getAmenities().find((a) => a.id === req.params.id);
+  const existing = (await store.getAmenities()).find((a) => a.id === req.params.id);
   if (!existing) return res.status(404).json({ error: "Amenity not found." });
 
   const patch = { ...req.body };
   if (patch.title !== undefined) patch.title = await translate.translateIfChanged(patch.title, existing.title);
   if (patch.text !== undefined) patch.text = await translate.translateIfChanged(patch.text, existing.text);
 
-  const amenity = store.updateAmenity(req.params.id, patch);
+  const amenity = await store.updateAmenity(req.params.id, patch);
   if (!amenity) return res.status(404).json({ error: "Amenity not found." });
   res.json(amenity);
 });
 
-app.delete("/api/admin/amenities/:id", requireAdmin, (req, res) => {
-  const removed = store.deleteAmenity(req.params.id);
+app.delete("/api/admin/amenities/:id", requireAdmin, async (req, res) => {
+  const removed = await store.deleteAmenity(req.params.id);
   if (!removed) return res.status(404).json({ error: "Amenity not found." });
   res.status(204).end();
 });
@@ -400,11 +395,11 @@ app.post("/api/admin/events", requireAdmin, async (req, res) => {
     infoUrl: infoUrl || ""
   };
 
-  res.status(201).json(store.addEvent(event));
+  res.status(201).json(await store.addEvent(event));
 });
 
 app.put("/api/admin/events/:id", requireAdmin, async (req, res) => {
-  const existing = store.getEvents().find((e) => e.id === req.params.id);
+  const existing = (await store.getEvents()).find((e) => e.id === req.params.id);
   if (!existing) return res.status(404).json({ error: "Event not found." });
 
   const patch = { ...req.body };
@@ -413,13 +408,13 @@ app.put("/api/admin/events/:id", requireAdmin, async (req, res) => {
     patch.description = await translate.translateIfChanged(patch.description, existing.description);
   }
 
-  const event = store.updateEvent(req.params.id, patch);
+  const event = await store.updateEvent(req.params.id, patch);
   if (!event) return res.status(404).json({ error: "Event not found." });
   res.json(event);
 });
 
-app.delete("/api/admin/events/:id", requireAdmin, (req, res) => {
-  const removed = store.deleteEvent(req.params.id);
+app.delete("/api/admin/events/:id", requireAdmin, async (req, res) => {
+  const removed = await store.deleteEvent(req.params.id);
   if (!removed) return res.status(404).json({ error: "Event not found." });
   res.status(204).end();
 });
@@ -437,36 +432,36 @@ async function backfillTranslations() {
 
   let backfilled = 0;
 
-  for (const room of store.getRooms()) {
+  for (const room of await store.getRooms()) {
     const patch = {};
     if (needsBackfill(room.name)) patch.name = await translate.translateToAllLanguages(pickSourceText(room.name));
     if (needsBackfill(room.description)) {
       patch.description = await translate.translateToAllLanguages(pickSourceText(room.description));
     }
     if (Object.keys(patch).length) {
-      store.updateRoom(room.id, patch);
+      await store.updateRoom(room.id, patch);
       backfilled++;
     }
   }
 
-  for (const event of store.getEvents()) {
+  for (const event of await store.getEvents()) {
     const patch = {};
     if (needsBackfill(event.title)) patch.title = await translate.translateToAllLanguages(pickSourceText(event.title));
     if (needsBackfill(event.description)) {
       patch.description = await translate.translateToAllLanguages(pickSourceText(event.description));
     }
     if (Object.keys(patch).length) {
-      store.updateEvent(event.id, patch);
+      await store.updateEvent(event.id, patch);
       backfilled++;
     }
   }
 
-  for (const amenity of store.getAmenities()) {
+  for (const amenity of await store.getAmenities()) {
     const patch = {};
     if (needsBackfill(amenity.title)) patch.title = await translate.translateToAllLanguages(pickSourceText(amenity.title));
     if (needsBackfill(amenity.text)) patch.text = await translate.translateToAllLanguages(pickSourceText(amenity.text));
     if (Object.keys(patch).length) {
-      store.updateAmenity(amenity.id, patch);
+      await store.updateAmenity(amenity.id, patch);
       backfilled++;
     }
   }
@@ -474,7 +469,15 @@ async function backfillTranslations() {
   if (backfilled) console.log(`DeepL: backfilled translations for ${backfilled} existing item(s).`);
 }
 
-app.listen(PORT, () => {
-  console.log(`Park Hotel Panorama API listening on http://localhost:${PORT}`);
-  backfillTranslations().catch((err) => console.warn("Translation backfill failed:", err.message));
-});
+AppDataSource.initialize()
+  .then(() => {
+    console.log("Postgres: connected.");
+    app.listen(PORT, () => {
+      console.log(`Park Hotel Panorama API listening on http://localhost:${PORT}`);
+      backfillTranslations().catch((err) => console.warn("Translation backfill failed:", err.message));
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to Postgres:", err.message);
+    process.exit(1);
+  });

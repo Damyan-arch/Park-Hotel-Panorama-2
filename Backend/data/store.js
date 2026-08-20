@@ -1,128 +1,124 @@
-const fs = require("fs");
-const path = require("path");
+const { AppDataSource } = require("./data-source");
 
-const DB_PATH = path.join(__dirname, "db.json");
+const rooms = () => AppDataSource.getRepository("Room");
+const gallery = () => AppDataSource.getRepository("GalleryImage");
+const events = () => AppDataSource.getRepository("Event");
+const amenities = () => AppDataSource.getRepository("Amenity");
+const settingsRepo = () => AppDataSource.getRepository("Settings");
+const bookingsRepo = () => AppDataSource.getRepository("BookingRequest");
+const inquiriesRepo = () => AppDataSource.getRepository("ContactInquiry");
 
-function read() {
-  return JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
-}
-
-function write(db) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-}
+const SETTINGS_ID = 1;
 
 module.exports = {
-  getSettings() {
-    return read().settings;
+  async getSettings() {
+    const row = await settingsRepo().findOneBy({ id: SETTINGS_ID });
+    if (!row) {
+      const created = settingsRepo().create({ id: SETTINGS_ID, data: {} });
+      await settingsRepo().save(created);
+      return created.data;
+    }
+    return row.data;
   },
-  updateSettings(patch) {
-    const db = read();
-    db.settings = { ...db.settings, ...patch };
-    write(db);
-    return db.settings;
+  async updateSettings(patch) {
+    const row = await settingsRepo().findOneBy({ id: SETTINGS_ID });
+    const merged = { ...(row ? row.data : {}), ...patch };
+    await settingsRepo().save({ id: SETTINGS_ID, data: merged });
+    return merged;
   },
 
-  getRooms() {
-    return read().rooms;
+  async getRooms() {
+    return rooms().find();
   },
-  addRoom(room) {
-    const db = read();
-    db.rooms.push(room);
-    write(db);
-    return room;
+  async addRoom(room) {
+    const saved = await rooms().save(rooms().create(room));
+    return saved;
   },
-  updateRoom(id, patch) {
-    const db = read();
-    const room = db.rooms.find((r) => r.id === id);
+  async updateRoom(id, patch) {
+    const room = await rooms().findOneBy({ id });
     if (!room) return null;
     Object.assign(room, patch);
-    write(db);
-    return room;
+    return rooms().save(room);
   },
-  deleteRoom(id) {
-    const db = read();
-    const index = db.rooms.findIndex((r) => r.id === id);
-    if (index === -1) return false;
-    db.rooms.splice(index, 1);
-    write(db);
-    return true;
+  async deleteRoom(id) {
+    const result = await rooms().delete({ id });
+    return result.affected > 0;
   },
 
-  getGallery() {
-    return read().gallery;
+  async getGallery() {
+    return gallery().find();
   },
-  addGalleryImage(image) {
-    const db = read();
-    db.gallery.push(image);
-    write(db);
-    return image;
+  async addGalleryImage(image) {
+    return gallery().save(gallery().create(image));
   },
-  updateGalleryImage(id, patch) {
-    const db = read();
-    const image = db.gallery.find((g) => g.id === id);
+  async updateGalleryImage(id, patch) {
+    const image = await gallery().findOneBy({ id });
     if (!image) return null;
     Object.assign(image, patch);
-    write(db);
-    return image;
+    return gallery().save(image);
   },
-  deleteGalleryImage(id) {
-    const db = read();
-    const index = db.gallery.findIndex((g) => g.id === id);
-    if (index === -1) return false;
-    db.gallery.splice(index, 1);
-    write(db);
-    return true;
+  async deleteGalleryImage(id) {
+    const result = await gallery().delete({ id });
+    return result.affected > 0;
   },
 
-  getEvents() {
-    return read().events;
+  async getEvents() {
+    return events().find();
   },
-  addEvent(event) {
-    const db = read();
-    db.events.push(event);
-    write(db);
-    return event;
+  async addEvent(event) {
+    return events().save(events().create(event));
   },
-  updateEvent(id, patch) {
-    const db = read();
-    const event = db.events.find((e) => e.id === id);
+  async updateEvent(id, patch) {
+    const event = await events().findOneBy({ id });
     if (!event) return null;
     Object.assign(event, patch);
-    write(db);
-    return event;
+    return events().save(event);
   },
-  deleteEvent(id) {
-    const db = read();
-    const index = db.events.findIndex((e) => e.id === id);
-    if (index === -1) return false;
-    db.events.splice(index, 1);
-    write(db);
-    return true;
+  async deleteEvent(id) {
+    const result = await events().delete({ id });
+    return result.affected > 0;
   },
 
-  getAmenities() {
-    return read().amenities;
+  async getAmenities() {
+    return amenities().find();
   },
-  addAmenity(amenity) {
-    const db = read();
-    db.amenities.push(amenity);
-    write(db);
-    return amenity;
+  async addAmenity(amenity) {
+    return amenities().save(amenities().create(amenity));
   },
-  updateAmenity(id, patch) {
-    const db = read();
-    const amenity = db.amenities.find((a) => a.id === id);
+  async updateAmenity(id, patch) {
+    const amenity = await amenities().findOneBy({ id });
     if (!amenity) return null;
     Object.assign(amenity, patch);
-    write(db);
-    return amenity;
+    return amenities().save(amenity);
   },
-  deleteAmenity(id) {
-    const db = read();
-    const index = db.amenities.findIndex((a) => a.id === id);
-    if (index === -1) return false;
-    db.amenities.splice(index, 1);
-    write(db);
-    return true;
+  async deleteAmenity(id) {
+    const result = await amenities().delete({ id });
+    return result.affected > 0;
+  },
+
+  async getBookings() {
+    return bookingsRepo().find({ order: { id: "DESC" } });
+  },
+  async addBooking(booking) {
+    return bookingsRepo().save(bookingsRepo().create(booking));
+  },
+  async updateBookingStatus(id, status) {
+    const booking = await bookingsRepo().findOneBy({ id });
+    if (!booking) return null;
+    booking.status = status;
+    return bookingsRepo().save(booking);
+  },
+
+  async getInquiries() {
+    return inquiriesRepo().find({ order: { id: "DESC" } });
+  },
+  async addInquiry(inquiry) {
+    return inquiriesRepo().save(inquiriesRepo().create(inquiry));
+  },
+  async updateInquiryStatus(id, status) {
+    const inquiry = await inquiriesRepo().findOneBy({ id });
+    if (!inquiry) return null;
+    inquiry.status = status;
+    return inquiriesRepo().save(inquiry);
   }
 };
