@@ -4,6 +4,9 @@
   "description": "API server for the Park Hotel Panorama redesign mockup",
   "main": "server.js",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
@@ -13,6 +16,7 @@
     "db:seed": "node data/seed.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1118.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "deepl-node": "^1.28.0",

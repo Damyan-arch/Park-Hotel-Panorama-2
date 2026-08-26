@@ -1,7 +1,6 @@
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 const path = require("path");
-const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
@@ -12,6 +11,7 @@ const sharp = require("sharp");
 const { AppDataSource } = require("./data/data-source");
 const store = require("./data/store");
 const translate = require("./services/translate");
+const spaces = require("./services/spaces");
 
 sharp.cache(false);
 
@@ -24,7 +24,11 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "da
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Lumen-Balkan-2179%";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD) {
+  console.error("ADMIN_PASSWORD must be set in the environment — refusing to start without it.");
+  process.exit(1);
+}
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 const app = express();
@@ -52,35 +56,32 @@ const FRONTEND_DIST = path.join(__dirname, "../Frontend/dist");
 app.use("/assets", express.static(path.join(FRONTEND_DIST, "assets"), { maxAge: "1y", immutable: true }));
 app.use(express.static(FRONTEND_DIST));
 
-const adminSessions = new Map(); // token -> expiresAt
-
-function issueToken() {
+// Sessions are persisted in Postgres (not an in-memory Map) — App Platform can
+// restart or redeploy the process at any time, which would otherwise silently
+// log every admin out.
+async function issueToken() {
   const token = crypto.randomBytes(32).toString("hex");
-  adminSessions.set(token, Date.now() + SESSION_TTL_MS);
+  await store.createAdminSession(token, new Date(Date.now() + SESSION_TTL_MS));
   return token;
 }
 
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
-  const expiresAt = token && adminSessions.get(token);
+  const session = token && (await store.getAdminSession(token));
 
-  if (!expiresAt || expiresAt < Date.now()) {
-    if (token) adminSessions.delete(token);
+  if (!session || session.expiresAt < new Date()) {
+    if (token) await store.deleteAdminSession(token);
     return res.status(401).json({ error: "Not authenticated." });
   }
 
   next();
 }
 
+// Buffered in memory, not written to local disk — App Platform's filesystem
+// doesn't persist between deploys/restarts, so uploads go to Spaces instead.
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: path.join(__dirname, "public/images/uploads"),
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
-      cb(null, `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${ext}`);
-    }
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!/^image\//.test(file.mimetype)) return cb(new Error("Only image files are allowed."));
@@ -179,19 +180,19 @@ app.post("/api/bookings", async (req, res) => {
 
 /* ---------- Admin auth ---------- */
 
-app.post("/api/admin/login", (req, res) => {
+app.post("/api/admin/login", async (req, res) => {
   const { email, password } = req.body || {};
 
   if (!email || !ADMIN_EMAILS.includes(email.trim().toLowerCase()) || password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Invalid email or password." });
   }
 
-  res.json({ token: issueToken() });
+  res.json({ token: await issueToken() });
 });
 
-app.post("/api/admin/logout", requireAdmin, (req, res) => {
+app.post("/api/admin/logout", requireAdmin, async (req, res) => {
   const token = req.headers.authorization.slice(7);
-  adminSessions.delete(token);
+  await store.deleteAdminSession(token);
   res.json({ success: true });
 });
 
@@ -228,23 +229,17 @@ app.post("/api/admin/upload", requireAdmin, (req, res) => {
 
     // Normalize every upload to a size- and format-optimized WebP, so a
     // full-resolution phone photo doesn't ship to visitors at full size.
-    const rawPath = req.file.path;
-    const baseName = path.parse(req.file.filename).name;
-    const optimizedName = `${baseName}.webp`;
-    const optimizedPath = path.join(path.dirname(rawPath), optimizedName);
-    // sharp can't read and write the same file in one pipeline — the uploaded
-    // file may already be named "<name>.webp", colliding with optimizedPath.
-    const tmpPath = path.join(path.dirname(rawPath), `${baseName}.processing`);
+    const filename = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.webp`;
 
     try {
-      await sharp(rawPath, { limitInputPixels: false })
+      const optimized = await sharp(req.file.buffer, { limitInputPixels: false })
         .resize({ width: 1600, withoutEnlargement: true })
         .webp({ quality: 78 })
-        .toFile(tmpPath);
-      fs.unlinkSync(rawPath);
-      fs.renameSync(tmpPath, optimizedPath);
-      res.status(201).json({ url: `/images/uploads/${optimizedName}` });
-    } catch {
+        .toBuffer();
+      const url = await spaces.uploadImage(filename, optimized, "image/webp");
+      res.status(201).json({ url });
+    } catch (uploadErr) {
+      console.error("Image upload failed:", uploadErr.message);
       res.status(500).json({ error: "Failed to process the uploaded image." });
     }
   });

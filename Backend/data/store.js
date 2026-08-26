@@ -7,6 +7,7 @@ const amenities = () => AppDataSource.getRepository("Amenity");
 const settingsRepo = () => AppDataSource.getRepository("Settings");
 const bookingsRepo = () => AppDataSource.getRepository("BookingRequest");
 const inquiriesRepo = () => AppDataSource.getRepository("ContactInquiry");
+const adminSessionsRepo = () => AppDataSource.getRepository("AdminSession");
 
 const SETTINGS_ID = 1;
 
@@ -120,5 +121,17 @@ module.exports = {
     if (!inquiry) return null;
     inquiry.status = status;
     return inquiriesRepo().save(inquiry);
+  },
+
+  // Persisted so an admin stays logged in across deploys/restarts — a serverless
+  // or auto-scaled host doesn't guarantee an in-memory session Map survives.
+  async createAdminSession(token, expiresAt) {
+    return adminSessionsRepo().save({ token, expiresAt });
+  },
+  async getAdminSession(token) {
+    return adminSessionsRepo().findOneBy({ token });
+  },
+  async deleteAdminSession(token) {
+    await adminSessionsRepo().delete({ token });
   }
 };
