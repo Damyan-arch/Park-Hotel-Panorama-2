@@ -611,6 +611,12 @@ function amenityFormFields(amenity = {}) {
       <label for="amenityText">Description</label>
       <textarea id="amenityText" rows="3">${escapeHtml(localizedForEdit(amenity.text))}</textarea>
     </div>
+    <div class="field checkbox-field">
+      <label>
+        <input type="checkbox" id="amenityMaintenance" ${amenity.underMaintenance ? "checked" : ""} />
+        Under maintenance (shows a badge on the site and dims the card)
+      </label>
+    </div>
   `;
 }
 
@@ -630,7 +636,8 @@ function openAmenityModal(amenity = null) {
       const payload = {
         icon: form.querySelector("#amenityIcon").value.trim(),
         title: form.querySelector("#amenityTitle").value.trim(),
-        text: form.querySelector("#amenityText").value.trim()
+        text: form.querySelector("#amenityText").value.trim(),
+        underMaintenance: form.querySelector("#amenityMaintenance").checked
       };
 
       if (amenity) {
@@ -666,7 +673,7 @@ function renderAmenitiesPanel() {
               <div class="entry-card amenity-row">
                 <div class="icon-badge"><span class="material-symbols-outlined">${escapeHtml(a.icon)}</span></div>
                 <div class="entry-main">
-                  <strong>${escapeHtml(localizedForEdit(a.title))}</strong>
+                  <strong>${escapeHtml(localizedForEdit(a.title))}</strong>${a.underMaintenance ? ` <span class="tag-maintenance">Under maintenance</span>` : ""}
                   <div class="entry-message">${escapeHtml(localizedForEdit(a.text))}</div>
                 </div>
                 <div class="content-actions">

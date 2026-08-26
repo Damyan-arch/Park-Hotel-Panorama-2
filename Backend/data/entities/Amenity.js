@@ -7,6 +7,7 @@ module.exports = new EntitySchema({
     id: { type: "varchar", primary: true },
     icon: { type: "varchar" },
     title: { type: "jsonb" },
-    text: { type: "jsonb" }
+    text: { type: "jsonb" },
+    underMaintenance: { type: "boolean", name: "under_maintenance", default: false }
   }
 });

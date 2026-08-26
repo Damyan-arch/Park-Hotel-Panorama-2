@@ -343,7 +343,7 @@ app.delete("/api/admin/gallery/:id", requireAdmin, async (req, res) => {
 /* ---------- Admin: amenities ---------- */
 
 app.post("/api/admin/amenities", requireAdmin, async (req, res) => {
-  const { icon, title, text } = req.body || {};
+  const { icon, title, text, underMaintenance } = req.body || {};
   if (!icon || !title) return res.status(400).json({ error: "Icon and title are required." });
 
   const [titleI18n, textI18n] = await Promise.all([
@@ -351,7 +351,7 @@ app.post("/api/admin/amenities", requireAdmin, async (req, res) => {
     translate.translateToAllLanguages(text || "")
   ]);
 
-  const amenity = { id: crypto.randomUUID(), icon, title: titleI18n, text: textI18n };
+  const amenity = { id: crypto.randomUUID(), icon, title: titleI18n, text: textI18n, underMaintenance: !!underMaintenance };
   res.status(201).json(await store.addAmenity(amenity));
 });
 
