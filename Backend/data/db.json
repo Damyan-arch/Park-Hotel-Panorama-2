@@ -1,0 +1,302 @@
+{
+  "settings": {
+    "hotelName": "Park Hotel Panorama",
+    "tagline": "",
+    "phoneNumber": "+359 897 820 065",
+    "phoneHref": "tel:+359897820065",
+    "address": "Tryavna, Bulgaria",
+    "mapQuery": "Park Hotel Panorama, Tryavna, Bulgaria",
+    "facebookUrl": "https://www.facebook.com/people/Park-Hotel-Panorama-Tryavna/61577866605747/",
+    "restaurantHoursDays": "Mon – Sun",
+    "restaurantHoursText": "From 7:00 PM to 10:30 PM",
+    "aboutTitle": "A harmonious blend of comfort and elegance",
+    "aboutText": "Our charming hotel in the heart of the Balkan Mountains offers a serene atmosphere, well-appointed rooms and high-end amenities, wrapped in the regional design charm of Tryavna — all backed by attentive, always-reachable service.",
+    "copyrightYear": 2026,
+    "heroImage": "/images/gallery/lounge-lobby.webp",
+    "aboutImage": "/images/gallery/courtyard-garden.webp",
+    "aboutFloatImage": "/images/gallery/rose-garden.webp",
+    "restaurantImage": "/images/gallery/restaurant-hall.webp",
+    "heroStat1Value": "4",
+    "heroStat1Label": "",
+    "heroStat2Value": "6+",
+    "heroStat2Label": "",
+    "heroStat3Value": "< 2h",
+    "heroStat3Label": "",
+    "heroStat4Value": "5★",
+    "heroStat4Label": "",
+    "leisurePlayTitle": "",
+    "leisurePlayText": "",
+    "leisureSpaTitle": "",
+    "leisureSpaText": "",
+    "leisurePlayImage1": "/images/leisure/playground-1.webp",
+    "leisurePlayImage2": "/images/leisure/playground-2.webp",
+    "leisurePlayImage3": "/images/leisure/playground-3.webp",
+    "leisurePlayImage4": "/images/leisure/kids-football.webp",
+    "leisureSpaImage": "/images/leisure/hot-tub.webp"
+  },
+  "rooms": [
+    {
+      "id": "f6d3eca6-6466-4e25-a9a0-bc65cdaa2784",
+      "name": {
+        "en": "Apartment with Balcony",
+        "bg": "Апартамент с балкон",
+        "de": "Wohnung mit Balkon",
+        "es": "Apartamento con balcón",
+        "ro": "Apartament cu balcon"
+      },
+      "type": "SUITE",
+      "description": {
+        "en": "A spacious apartment with a private balcony framing the Balkan Mountains, a separate lounge area and room for the whole family to spread out.",
+        "bg": "Просторен апартамент със собствен балкон, откъдето се разкрива гледка към Стара планина, с отделна зона за почивка и достатъчно място, където цялото семейство да се настани удобно.",
+        "de": "Eine geräumige Ferienwohnung mit einem eigenen Balkon, von dem aus man einen Blick auf das Balkangebirge hat, einem separaten Wohnbereich und genügend Platz, damit sich die ganze Familie wohlfühlen kann.",
+        "es": "Un espacioso piso con un balcón privado con vistas a los Montes Balcánicos, una zona de salón independiente y espacio suficiente para que toda la familia se sienta a gusto.",
+        "ro": "Un apartament spațios, cu un balcon privat de unde se vede Munții Balcani, o zonă de relaxare separată și spațiu suficient pentru ca întreaga familie să se simtă confortabil."
+      },
+      "capacity": 4,
+      "sizeSqm": 42,
+      "basePricePerNight": 100,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/apartment-balcony.webp"
+    },
+    {
+      "id": "b82fc8cb-0ed4-4f01-89ef-66fc3b40e731",
+      "name": {
+        "en": "Double Room with Balcony",
+        "bg": "Двойна стая с балкон",
+        "de": "Doppelzimmer mit Balkon",
+        "es": "Habitación doble con balcón",
+        "ro": "Cameră dublă cu balcon"
+      },
+      "type": "DOUBLE",
+      "description": {
+        "en": "A calm, well-appointed double room with balcony access, ideal for couples visiting Tryavna for a quiet mountain escape.",
+        "bg": "Спокойна, добре обзаведена двойна стая с излаз към балкон, идеална за двойки, които посещават Трявна, за да се насладят на тиха почивка в планината.",
+        "de": "Ein ruhiges, gut ausgestattetes Doppelzimmer mit Zugang zum Balkon – ideal für Paare, die Tryavna für einen ruhigen Urlaub in den Bergen besuchen.",
+        "es": "Una habitación doble tranquila y bien equipada con acceso al balcón, ideal para parejas que visitan Tryavna en busca de una escapada tranquila a la montaña.",
+        "ro": "O cameră dublă liniștită și bine amenajată, cu acces la balcon, ideală pentru cuplurile care vizitează Tryavna pentru o escapadă liniștită la munte."
+      },
+      "capacity": 2,
+      "sizeSqm": 30,
+      "basePricePerNight": 70,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/double-room-balcony.webp"
+    },
+    {
+      "id": "204bef47-c659-46fc-a7b0-e7b5b5b3ff2b",
+      "name": {
+        "en": "Town Suite",
+        "bg": "Градски апартамент",
+        "de": "Stadt-Suite",
+        "es": "Suite «Town»",
+        "ro": "Apartamentul „Town”"
+      },
+      "type": "SUITE",
+      "description": {
+        "en": "Our largest suite, combining regional design charm with high-end comfort — steps away from Tryavna's old town.",
+        "bg": "Най-големият ни апартамент, съчетаващ очарованието на регионалния дизайн с луксозен комфорт — на няколко крачки от стария град на Трявна.",
+        "de": "Unsere größte Suite, die den Charme der regionalen Architektur mit erstklassigem Komfort verbindet – nur wenige Schritte von der Altstadt von Tryavna entfernt.",
+        "es": "Nuestra suite más grande, que combina el encanto del diseño regional con el confort de alta gama, a pocos pasos del casco antiguo de Tryavna.",
+        "ro": "Cea mai spațioasă suită a noastră, care îmbină farmecul stilului arhitectural regional cu confortul de lux — la doar câțiva pași de centrul vechi al orașului Tryavna."
+      },
+      "capacity": 4,
+      "sizeSqm": 49,
+      "basePricePerNight": 110,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/town-suite.webp"
+    },
+    {
+      "id": "9a332e54-5d7b-41e0-a47f-b3ce35748f82",
+      "name": {
+        "en": "Triple Room with Balcony",
+        "bg": "Тройна стая с балкон",
+        "de": "Dreibettzimmer mit Balkon",
+        "es": "Habitación triple con balcón",
+        "ro": "Cameră triplă cu balcon"
+      },
+      "type": "FAMILY",
+      "description": {
+        "en": "A comfortable triple room with balcony, well suited for small families or friends travelling together.",
+        "bg": "Удобна тройна стая с балкон, подходяща за малки семейства или приятели, пътуващи заедно.",
+        "de": "Ein komfortables Dreibettzimmer mit Balkon, ideal für kleine Familien oder Freunde, die gemeinsam reisen.",
+        "es": "Una cómoda habitación triple con balcón, ideal para familias pequeñas o grupos de amigos que viajen juntos.",
+        "ro": "O cameră triplă confortabilă, cu balcon, ideală pentru familii mici sau grupuri de prieteni care călătoresc împreună."
+      },
+      "capacity": 3,
+      "sizeSqm": 30,
+      "basePricePerNight": 85,
+      "currency": "EUR",
+      "imageUrl": "/images/rooms/triple-room-balcony.webp"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "2ed3b27e-a491-4647-b7cb-281a87dae98f",
+      "imageUrl": "/images/gallery/lounge-lobby.webp",
+      "alt": "Hotel lounge with mountain views",
+      "sortOrder": 0
+    },
+    {
+      "id": "dadbdc41-f1ef-44e4-a10a-d7efa21a426d",
+      "imageUrl": "/images/gallery/restaurant-hall.webp",
+      "alt": "Restaurant dining hall",
+      "sortOrder": 1
+    },
+    {
+      "id": "6b8f75e6-6de2-4fa3-9b79-5b1c8f42fcdf",
+      "imageUrl": "/images/gallery/twin-room.webp",
+      "alt": "Twin room",
+      "sortOrder": 2
+    },
+    {
+      "id": "b1fec127-5738-4a5d-b8fc-9051c70e86c7",
+      "imageUrl": "/images/gallery/room-lounge.webp",
+      "alt": "Room sitting area",
+      "sortOrder": 3
+    },
+    {
+      "id": "1eb5b372-b380-40d2-8642-be1837b0e936",
+      "imageUrl": "/images/gallery/courtyard-garden.webp",
+      "alt": "Hotel courtyard and garden",
+      "sortOrder": 4
+    },
+    {
+      "id": "0d91fdc2-6711-4188-a97d-078adcfae3a0",
+      "imageUrl": "/images/gallery/rose-garden.webp",
+      "alt": "Rose garden",
+      "sortOrder": 5
+    }
+  ],
+  "events": [
+    {
+      "id": "ev-rodzheta-contest",
+      "title": {
+        "en": "Rodzheta Contest — The Living Heritage",
+        "bg": "Конкурс „Роджета“ — Живото наследство",
+        "de": "Rodzheta-Wettbewerb – Das lebendige Kulturerbe",
+        "es": "Concurso «Rodzheta»: El patrimonio vivo",
+        "ro": "Concursul „Rodzheta” — Patrimoniul viu"
+      },
+      "date": "2026-09-19",
+      "time": "Sat–Sun, Sept 19–20",
+      "description": {
+        "en": "A two-day heritage celebration hosted at Park Hotel Panorama: a folk costume and tradition contest with individual and group categories, prizes for the most authentic representation, plus a craft market with local products and homemade goods.\nContest entries: 089 057 2865\nHotel bookings: 089 782 0065.",
+        "bg": "Двудневен празник, посветен на културното наследство, организиран в „Парк Хотел Панорама“: конкурс за народни носии и традиции с индивидуални и групови категории, награди за най-автентично представяне, както и пазар на занаяти с местни продукти и домашно изработени изделия.\nЗаписване за конкурса: 089 057 2865\nРезервации за хотела: 089 782 0065.",
+        "de": "Ein zweitägiges Fest zur Würdigung des kulturellen Erbes im Park Hotel Panorama: ein Wettbewerb für Trachten und Traditionen mit Einzel- und Gruppenkategorien, Preise für die authentischste Darbietung sowie ein Kunsthandwerksmarkt mit regionalen Produkten und selbst hergestellten Waren.\nAnmeldung zum Wettbewerb: 089 057 2865\nHotelreservierungen: 089 782 0065.",
+        "es": "Una celebración del patrimonio cultural de dos días de duración que tendrá lugar en el Park Hotel Panorama: un concurso de trajes típicos y tradiciones con categorías individuales y colectivas, premios a la representación más auténtica, además de un mercadillo de artesanía con productos locales y artículos caseros.\nInscripciones al concurso: 089 057 2865\nReservas de hotel: 089 782 0065.",
+        "ro": "O sărbătoare a patrimoniului cultural de două zile, organizată la Park Hotel Panorama: un concurs de costume populare și tradiții, cu categorii individuale și de grup, premii pentru cea mai autentică reprezentare, precum și un târg de artizanat cu produse locale și articole făcute în casă.\nÎnscrieri la concurs: 089 057 2865\nRezervări la hotel: 089 782 0065."
+      },
+      "imageUrl": "/images/events/rodzheta-contest.webp",
+      "infoUrl": "https://festnashevicata.blogspot.com/2026/08/blog-post.html"
+    }
+  ],
+  "amenities": [
+    {
+      "id": "am-spa",
+      "icon": "spa",
+      "title": {
+        "en": "Pool & Spa",
+        "bg": "Басейн и спа",
+        "de": "Pool & Spa",
+        "es": "Piscina y spa",
+        "ro": "Piscină și spa"
+      },
+      "text": {
+        "en": "Unwind in our spa centre with sauna, steam bath and a heated pool.",
+        "bg": "Отпуснете се в нашия спа-център със сауна, парна баня и отопляем басейн.",
+        "de": "Entspannen Sie sich in unserem Wellnessbereich mit Sauna, Dampfbad und beheiztem Pool.",
+        "es": "Relájate en nuestro centro de spa, que cuenta con sauna, baño de vapor y una piscina climatizada.",
+        "ro": "Relaxați-vă în centrul nostru spa, dotat cu saună, baie de aburi și o piscină încălzită."
+      }
+    },
+    {
+      "id": "am-museum",
+      "icon": "museum",
+      "title": {
+        "en": "Cultural Sites",
+        "bg": "Културни забележителности",
+        "de": "Kulturelle Sehenswürdigkeiten",
+        "es": "Lugares de interés cultural",
+        "ro": "Site-uri culturale"
+      },
+      "text": {
+        "en": "Museums, workshops and cultural landmarks are all within easy reach.",
+        "bg": "Музеите, ателиетата и културните забележителности са на кратко разстояние.",
+        "de": "Museen, Werkstätten und kulturelle Sehenswürdigkeiten sind alle leicht zu erreichen.",
+        "es": "Los museos, los talleres y los lugares de interés cultural se encuentran todos a poca distancia.",
+        "ro": "Muzeele, atelierele și obiectivele culturale se află toate la o distanță mică."
+      }
+    },
+    {
+      "id": "am-bike",
+      "icon": "directions_bike",
+      "title": {
+        "en": "Bike Trails",
+        "bg": "Велосипедни пътеки",
+        "de": "Radwege",
+        "es": "Rutas ciclistas",
+        "ro": "Trasee pentru biciclete"
+      },
+      "text": {
+        "en": "Explore scenic bike trails starting right from the hotel's doorstep.",
+        "bg": "Разгледайте живописни велосипедни маршрути, които започват точно от прага на хотела.",
+        "de": "Entdecken Sie malerische Radwege, die direkt vor der Haustür des Hotels beginnen.",
+        "es": "Explora las pintorescas rutas ciclistas que comienzan justo a las puertas del hotel.",
+        "ro": "Explorați traseele pitorești de ciclism care încep chiar de la ușa hotelului."
+      }
+    },
+    {
+      "id": "am-cuisine",
+      "icon": "restaurant",
+      "title": {
+        "en": "Local Cuisine",
+        "bg": "Местна кухня",
+        "de": "Lokale Küche",
+        "es": "Cocina local",
+        "ro": "Bucătăria locală"
+      },
+      "text": {
+        "en": "Taste authentic Bulgarian flavours and traditional regional specialties.",
+        "bg": "Опитайте автентични български вкусове и традиционни регионални специалитети.",
+        "de": "Genießen Sie authentische bulgarische Aromen und traditionelle regionale Spezialitäten.",
+        "es": "Disfruta de los auténticos sabores búlgaros y de las especialidades regionales tradicionales.",
+        "ro": "Savurați aromele autentice bulgare și specialitățile tradiționale regionale."
+      }
+    },
+    {
+      "id": "am-wine",
+      "icon": "wine_bar",
+      "title": {
+        "en": "Wineries",
+        "bg": "Винарни",
+        "de": "Weingüter",
+        "es": "Bodegas",
+        "ro": "Crame"
+      },
+      "text": {
+        "en": "Guided wine tastings and vineyard visits in the surrounding valleys.",
+        "bg": "Дегустации на вино с екскурзовод и посещения на лозя в околните долини.",
+        "de": "Geführte Weinverkostungen und Besichtigungen von Weingütern in den umliegenden Tälern.",
+        "es": "Catas de vino guiadas y visitas a viñedos en los valles de los alrededores.",
+        "ro": "Degustări de vinuri cu ghid și vizite la podgorii în văile din împrejurimi."
+      }
+    },
+    {
+      "id": "am-hiking",
+      "icon": "hiking",
+      "title": {
+        "en": "Hiking Trails",
+        "bg": "Пешеходни маршрути",
+        "de": "Wanderwege",
+        "es": "Rutas de senderismo",
+        "ro": "Trasee de drumeție"
+      },
+      "text": {
+        "en": "Trails for every level, from gentle village walks to mountain peaks.",
+        "bg": "Маршрути за всяко ниво – от леки разходки из селото до планински върхове.",
+        "de": "Wanderwege für jedes Niveau, von gemütlichen Spaziergängen durch das Dorf bis hin zu Berggipfeln.",
+        "es": "Rutas para todos los niveles, desde tranquilos paseos por el pueblo hasta cimas de montaña.",
+        "ro": "Trasee pentru toate nivelurile, de la plimbări ușoare prin sat până la vârfuri montane."
+      }
+    }
+  ]
+}
