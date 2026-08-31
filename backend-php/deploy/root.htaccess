@@ -1,0 +1,8 @@
+# Deploy this file AS public_html/.htaccess (rename on upload — it can't be
+# committed with that name inside this repo since Frontend/ and backend-php/
+# are separate folders here, but on SiteGround they land in the same public_html).
+# Routes every /api/* request to the PHP front controller; everything else
+# (the built frontend's index.html, admin/, events/, assets/, images/) is
+# served directly by Apache as static files, untouched.
+RewriteEngine On
+RewriteRule ^api/ api/index.php [L]

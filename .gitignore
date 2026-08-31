@@ -1,3 +1,5 @@
 node_modules/
 Frontend/dist/
 .env
+backend-php/app/config.local.php
+backend-php/tests/config.local.php

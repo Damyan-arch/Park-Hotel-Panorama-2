@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  backend-php:
+    name: Backend (PHP) — lint + test suite
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: park_hotel_app
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: park_hotel_panorama
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_pgsql, gd, curl, mbstring, fileinfo
+          coverage: none
+
+      - name: Syntax-check every PHP file
+        run: find backend-php -name "*.php" -print0 | xargs -0 -n1 -P4 php -l
+
+      - name: Write test DB config (points at the CI Postgres service)
+        run: |
+          cat > backend-php/tests/config.local.php << 'EOF'
+          <?php
+          return [
+              'db' => [
+                  'driver' => 'pgsql',
+                  'host' => '127.0.0.1',
+                  'port' => 5432,
+                  'name' => 'park_hotel_panorama',
+                  'user' => 'park_hotel_app',
+                  'password' => 'ci_test_password',
+              ],
+          ];
+          EOF
+
+      - name: Run automated test suite
+        run: php backend-php/tests/run.php
+
+  frontend-build:
+    name: Frontend — build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: Frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: Frontend
+        run: npm run build
