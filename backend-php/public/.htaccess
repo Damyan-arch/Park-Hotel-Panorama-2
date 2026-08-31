@@ -1,0 +1,10 @@
+# This folder is deployed as SiteGround's public_html/api/. Everything under
+# it is routed to the front controller — belt-and-suspenders alongside the
+# public_html root .htaccess rewrite (see deploy/root.htaccess), in case this
+# folder is ever reached directly.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+Options -Indexes

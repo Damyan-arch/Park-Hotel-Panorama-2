@@ -1,0 +1,3 @@
+# This entire folder (config.local.php, source code) must never be served
+# directly — only public/index.php reaches it, via require, not HTTP.
+Require all denied
