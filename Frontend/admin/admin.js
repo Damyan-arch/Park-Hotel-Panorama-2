@@ -108,13 +108,12 @@ async function loadData() {
   }
 }
 
-async function toggleLeadStatus(kind, id, currentStatus) {
-  const nextStatus = currentStatus === "new" ? "contacted" : "new";
+async function setLeadStatus(kind, id, status) {
   try {
-    await apiFetch(`/admin/${kind}/${id}`, { method: "PATCH", body: JSON.stringify({ status: nextStatus }) });
+    await apiFetch(`/admin/${kind}/${id}`, { method: "PATCH", body: JSON.stringify({ status }) });
     const list = kind === "bookings" ? state.bookings : state.inquiries;
     const entry = list.find((e) => e.id === id);
-    if (entry) entry.status = nextStatus;
+    if (entry) entry.status = status;
     render();
   } catch (err) {
     alert(err.message);
@@ -256,6 +255,27 @@ function renderLogin() {
 
 /* ---------- Leads (bookings / inquiries) ---------- */
 
+function bookingStatusActions(entry) {
+  if (entry.status === "rejected") {
+    return `<button class="status-toggle" data-kind="bookings" data-id="${entry.id}" data-status="new">Restore to pending</button>`;
+  }
+  const otherStatus = entry.status === "new" ? "contacted" : "new";
+  return `
+    <button class="status-toggle" data-kind="bookings" data-id="${entry.id}" data-status="${otherStatus}">
+      Mark as ${otherStatus}
+    </button>
+    <button class="status-toggle status-reject" data-kind="bookings" data-id="${entry.id}" data-status="rejected">
+      Reject
+    </button>
+  `;
+}
+
+function statusLabel(status) {
+  if (status === "new") return "New";
+  if (status === "contacted") return "Contacted";
+  return "Rejected";
+}
+
 function renderEntryCard(kind, entry) {
   const isBooking = kind === "bookings";
   return `
@@ -272,10 +292,14 @@ function renderEntryCard(kind, entry) {
         ${!isBooking ? `<div class="entry-message">${escapeHtml(entry.message)}</div>` : ""}
       </div>
       <div class="entry-side">
-        <span class="status-badge ${entry.status}">${entry.status === "new" ? "New" : "Contacted"}</span>
-        <button class="status-toggle" data-kind="${kind}" data-id="${entry.id}" data-status="${entry.status}">
-          Mark as ${entry.status === "new" ? "contacted" : "new"}
-        </button>
+        <span class="status-badge ${entry.status}">${statusLabel(entry.status)}</span>
+        ${
+          isBooking
+            ? bookingStatusActions(entry)
+            : `<button class="status-toggle" data-kind="${kind}" data-id="${entry.id}" data-status="${entry.status === "new" ? "contacted" : "new"}">
+                 Mark as ${entry.status === "new" ? "contacted" : "new"}
+               </button>`
+        }
       </div>
     </div>
   `;
@@ -950,7 +974,7 @@ function wirePanelEvents() {
   if (!panel) return;
 
   panel.querySelectorAll(".status-toggle").forEach((btn) => {
-    btn.addEventListener("click", () => toggleLeadStatus(btn.dataset.kind, Number(btn.dataset.id), btn.dataset.status));
+    btn.addEventListener("click", () => setLeadStatus(btn.dataset.kind, Number(btn.dataset.id), btn.dataset.status));
   });
 
   panel.querySelector("#addRoomBtn")?.addEventListener("click", () => openRoomModal());

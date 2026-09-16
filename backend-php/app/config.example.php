@@ -20,6 +20,16 @@ return [
     'frontend_origins' => 'http://localhost:4202',
     'deepl_api_key' => '',
 
+    // Notification email sent to the hotel whenever a guest submits a booking
+    // request. Uses PHP's built-in mail() — no SMTP credentials needed, works
+    // on SiteGround out of the box (deliverability isn't guaranteed without
+    // SPF/DKIM, but this is a fine starting point).
+    'mail' => [
+        'notify_to' => '',
+        'from_email' => '',
+        'from_name' => 'Park Hotel Panorama',
+    ],
+
     // Absolute filesystem path to public_html/images/uploads on THIS server —
     // varies per account/environment, so it's not hardcoded as a relative
     // path. On SiteGround this is typically something like

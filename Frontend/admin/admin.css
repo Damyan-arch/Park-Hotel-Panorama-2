@@ -359,6 +359,11 @@ input {
   color: #204a3a;
 }
 
+.status-badge.rejected {
+  background: rgba(178, 58, 42, 0.16);
+  color: #8a2f1f;
+}
+
 .status-toggle {
   font-size: 0.78rem;
   font-weight: 700;
@@ -366,6 +371,10 @@ input {
   background: none;
   padding: 4px 0;
   text-decoration: underline;
+}
+
+.status-toggle.status-reject {
+  color: #b23a2a;
 }
 
 .empty-state {

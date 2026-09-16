@@ -13,6 +13,14 @@ class Response
         // already, which the test runner's own progress output always has.
         if (PHP_SAPI !== 'cli') {
             header('Content-Type: application/json; charset=utf-8');
+            // Every response here reflects live, mutable data (bookings, events,
+            // rooms, admin sessions...) — SiteGround's dynamic/proxy cache has no
+            // way to know that on its own, and was observed caching GET /api/events
+            // and silently serving stale data after admin writes. This is the only
+            // reliable fix at the app level; the proxy still needs an explicit
+            // exclusion/purge (see Site Tools → Speed → Caching) since some caching
+            // layers cache before consulting response headers.
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         }
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }

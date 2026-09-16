@@ -62,6 +62,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 App\Db\Database::init($config['db']);
 App\Auth\AdminAuth::init($config['admin']);
 App\Services\TranslateService::init($config['deepl_api_key'] ?? '');
+App\Services\MailService::init($config['mail'] ?? []);
 
 define('UPLOADS_DIR', rtrim($config['uploads_dir'] ?? '', '/'));
 
