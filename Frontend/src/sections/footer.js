@@ -28,13 +28,15 @@ export function renderFooter() {
               <li><a href="#rooms">${t("nav.rooms")}</a></li>
               <li><a href="#restaurant">${t("nav.restaurant")}</a></li>
               <li><a href="#gallery">${t("nav.gallery")}</a></li>
+              <li><a href="/events/">${t("nav.events")}</a></li>
               <li><a href="#location">${t("nav.location")}</a></li>
             </ul>
           </div>
           <div class="footer-col">
             <h4>${t("footer.contact")}</h4>
             <ul>
-              <li>${escapeHtml(state.settings.phoneNumber)}</li>
+              <li><a href="tel:${escapeHtml((state.settings.phoneNumber || "").replace(/[^+0-9]/g, ""))}">${escapeHtml(state.settings.phoneNumber)}</a></li>
+              <li><a href="mailto:${escapeHtml(state.settings.email)}">${escapeHtml(state.settings.email)}</a></li>
               <li>${escapeHtml(state.settings.address)}</li>
               <li>${escapeHtml(state.settings.restaurantHoursDays)}</li>
             </ul>

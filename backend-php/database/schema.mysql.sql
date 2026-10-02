@@ -37,7 +37,8 @@ CREATE TABLE events (
   time VARCHAR(255) NOT NULL DEFAULT '',
   description JSON NOT NULL,
   image_url TEXT NOT NULL,
-  info_url TEXT NOT NULL
+  info_url TEXT NOT NULL,
+  gallery JSON NULL
 );
 
 CREATE TABLE amenities (

@@ -1,4 +1,6 @@
 // The backend serves this app's built files directly (see Backend/server.js),
+import { FALLBACK_SETTINGS, parseDateOnly, startOfToday } from "../src/state.js";
+
 const API_BASE = "/api";
 const MEDIA_BASE = "";
 const TOKEN_KEY = "php_admin_token";
@@ -507,6 +509,37 @@ function renderGalleryPanel() {
 
 /* ---------- Events ---------- */
 
+// Existing photos stay in the DOM as data-gallery-url chips; removing one just
+// drops its chip, and the surviving chips are what gets saved.
+function eventGalleryHtml(gallery = []) {
+  return `
+    <div class="field">
+      <label for="eventGallery">Photos</label>
+      <div class="gallery-chips" id="eventGalleryChips">
+        ${gallery
+          .map(
+            (url) => `
+          <div class="gallery-chip" data-gallery-url="${escapeHtml(url)}">
+            <img src="${mediaUrl(url)}" alt="" />
+            <button type="button" class="gallery-chip-remove" data-remove-gallery title="Remove photo">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>`
+          )
+          .join("")}
+      </div>
+      <input id="eventGallery" type="file" accept="image/*" multiple />
+      <p class="field-hint">Several photos can be added at once — they show as a gallery on the events page, which is how past events are documented.</p>
+    </div>
+  `;
+}
+
+function wireEventGallery(form) {
+  form.querySelectorAll("[data-remove-gallery]").forEach((btn) =>
+    btn.addEventListener("click", () => btn.closest(".gallery-chip").remove())
+  );
+}
+
 function eventFormFields(event = {}) {
   return `
     ${imagePickerHtml("eventImage", event.imageUrl)}
@@ -534,6 +567,7 @@ function eventFormFields(event = {}) {
       <input id="eventInfoUrl" type="url" value="${escapeHtml(event.infoUrl || "")}" placeholder="https://…" />
       <p class="field-hint">If set, the events page shows a "More Information" button linking here.</p>
     </div>
+    ${eventGalleryHtml(event.gallery || [])}
   `;
 }
 
@@ -542,11 +576,20 @@ function openEventModal(event = null) {
     title: event ? "Edit Event" : "Add Event",
     bodyHtml: eventFormFields(event || {}),
     submitLabel: event ? "Save Changes" : "Add Event",
-    onMount: (form) => wireImagePicker(form, "eventImage"),
+    onMount: (form) => {
+      wireImagePicker(form, "eventImage");
+      wireEventGallery(form);
+    },
     onSubmit: async (form) => {
       const imageFile = form.querySelector("#eventImage").files[0];
       let imageUrl = event?.imageUrl || "";
       if (imageFile) imageUrl = await uploadImage(imageFile);
+
+      const keptPhotos = [...form.querySelectorAll("[data-gallery-url]")].map((el) => el.dataset.galleryUrl);
+      const newPhotos = [];
+      for (const file of form.querySelector("#eventGallery").files) {
+        newPhotos.push(await uploadImage(file));
+      }
 
       const payload = {
         title: form.querySelector("#eventTitle").value.trim(),
@@ -554,7 +597,8 @@ function openEventModal(event = null) {
         time: form.querySelector("#eventTime").value.trim(),
         description: form.querySelector("#eventDescription").value.trim(),
         imageUrl,
-        infoUrl: form.querySelector("#eventInfoUrl").value.trim()
+        infoUrl: form.querySelector("#eventInfoUrl").value.trim(),
+        gallery: [...keptPhotos, ...newPhotos]
       };
 
       if (event) {
@@ -578,7 +622,11 @@ async function deleteEvent(id) {
 
 function formatEventDate(dateStr) {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+  return parseDateOnly(dateStr).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function isPastEvent(dateStr) {
+  return parseDateOnly(dateStr) < startOfToday();
 }
 
 function renderEventsPanel() {
@@ -596,7 +644,10 @@ function renderEventsPanel() {
                 ${e.imageUrl ? `<img class="content-thumb" src="${mediaUrl(e.imageUrl)}" alt="${escapeHtml(localizedForEdit(e.title))}" />` : ""}
                 <div class="content-body">
                   <strong>${escapeHtml(localizedForEdit(e.title))}</strong>
-                  <span class="content-sub">${formatEventDate(e.date)}${e.time ? ` · ${escapeHtml(e.time)}` : ""}</span>
+                  <span class="content-sub">
+                    <span class="event-tag ${isPastEvent(e.date) ? "past" : "upcoming"}">${isPastEvent(e.date) ? "Past" : "Upcoming"}</span>
+                    ${formatEventDate(e.date)}${e.time ? ` · ${escapeHtml(e.time)}` : ""}${e.gallery?.length ? ` · ${e.gallery.length} photo${e.gallery.length === 1 ? "" : "s"}` : ""}
+                  </span>
                 </div>
                 <div class="content-actions">
                   <button class="icon-btn" data-edit-event="${e.id}" title="Edit"><span class="material-symbols-outlined">edit</span></button>
@@ -726,14 +777,17 @@ function renderSettingsPanel() {
           <div class="field"><label for="setPhone">Phone number</label><input id="setPhone" value="${escapeHtml(s.phoneNumber || "")}" /></div>
         </div>
         <div class="form-row">
+          <div class="field"><label for="setEmail">Email</label><input id="setEmail" type="email" value="${escapeHtml(s.email || FALLBACK_SETTINGS.email)}" /></div>
           <div class="field"><label for="setAddress">Address</label><input id="setAddress" value="${escapeHtml(s.address || "")}" /></div>
+        </div>
+        <div class="form-row">
           <div class="field"><label for="setFacebook">Facebook URL</label><input id="setFacebook" value="${escapeHtml(s.facebookUrl || "")}" /></div>
+          <div class="field"><label for="setMapQuery">Map search query</label><input id="setMapQuery" value="${escapeHtml(s.mapQuery || "")}" /></div>
         </div>
         <div class="form-row">
           <div class="field"><label for="setHoursDays">Restaurant days</label><input id="setHoursDays" value="${escapeHtml(s.restaurantHoursDays || "")}" /></div>
           <div class="field"><label for="setHoursText">Restaurant hours</label><input id="setHoursText" value="${escapeHtml(s.restaurantHoursText || "")}" /></div>
         </div>
-        <div class="field"><label for="setMapQuery">Map search query</label><input id="setMapQuery" value="${escapeHtml(s.mapQuery || "")}" /></div>
       </div>
 
       <div class="settings-section">
@@ -835,6 +889,7 @@ function wireSettingsPanel() {
       const payload = {
         hotelName: form.querySelector("#setHotelName").value.trim(),
         phoneNumber: form.querySelector("#setPhone").value.trim(),
+        email: form.querySelector("#setEmail").value.trim(),
         address: form.querySelector("#setAddress").value.trim(),
         facebookUrl: form.querySelector("#setFacebook").value.trim(),
         restaurantHoursDays: form.querySelector("#setHoursDays").value.trim(),

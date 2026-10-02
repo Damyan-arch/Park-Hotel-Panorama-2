@@ -30,7 +30,10 @@ async function init() {
     fetchJSON("/events", [])
   ]);
 
-  state.settings = settings;
+  // Spread over the fallbacks: the settings row is a free-form JSON blob, so a
+  // key the hotel has never saved (email, phoneHref, ...) would otherwise be
+  // undefined and render as an empty contact line.
+  state.settings = { ...FALLBACK_SETTINGS, ...settings };
   state.amenities = amenities;
   state.rooms = rooms;
   state.gallery = gallery;

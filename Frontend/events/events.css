@@ -94,3 +94,195 @@
   padding: 32px 0;
   text-align: center;
 }
+
+.events-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.events-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.events-footer .btn-line {
+  color: var(--cream-050);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- Upcoming / Past tabs ---------- */
+
+.events-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 28px 0 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.events-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink-600);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.events-tabs button:hover {
+  color: var(--pine-900);
+}
+
+.events-tabs button.active {
+  color: var(--pine-900);
+  border-bottom-color: var(--gold-500);
+}
+
+.events-tab-count {
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--cream-100);
+  font-size: 0.75rem;
+  color: var(--ink-600);
+}
+
+.events-tabs button.active .events-tab-count {
+  background: var(--gold-500);
+  color: var(--pine-900);
+}
+
+/* Past events read as archive material, not as something to sign up for. */
+.event-full-card.is-past .event-cover {
+  filter: saturate(0.82);
+}
+
+/* ---------- Per-event photo gallery ---------- */
+
+.event-gallery {
+  margin: 0 0 18px;
+}
+
+.event-gallery-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: var(--ink-600);
+}
+
+.event-gallery-head .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--gold-500);
+}
+
+.event-gallery-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.event-gallery-thumb {
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm, 8px);
+  overflow: hidden;
+  background: var(--cream-100);
+  cursor: pointer;
+  aspect-ratio: 1;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.event-gallery-thumb:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold-500);
+}
+
+.event-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- Lightbox ---------- */
+
+.events-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(16, 24, 20, 0.88);
+}
+
+.events-lightbox[hidden] {
+  display: none;
+}
+
+.events-lightbox img {
+  max-width: min(100%, 1100px);
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+}
+
+.events-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--cream-050);
+  cursor: pointer;
+}
+
+.events-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+@media (max-width: 640px) {
+  .events-header-row {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-block: 14px;
+  }
+
+  .events-tabs button {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 10px;
+  }
+}
+
+/* The shared .lang-current is white-on-transparent for the homepage's dark
+   topbar. The events header is cream, so it needs the inverse treatment or the
+   switcher all but disappears. */
+.events-header .lang-current {
+  background: rgba(18, 39, 29, 0.05);
+  color: var(--pine-900);
+  border: 1px solid var(--line);
+}
+
+.events-header .lang-current:hover {
+  background: rgba(18, 39, 29, 0.1);
+}

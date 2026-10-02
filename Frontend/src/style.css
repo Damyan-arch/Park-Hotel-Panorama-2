@@ -387,7 +387,11 @@ nav.main-nav a:hover::after {
 }
 
 @media (min-width: 1081px) {
-  .brand:not(.brand-pinned) {
+  /* Scoped to .site-header: this hides the inline brand only where
+     .brand-pinned takes over for it. Unscoped, it also blanked the brand on
+     standalone pages (the events page) that reuse .brand with no pinned
+     counterpart to replace it. */
+  .site-header .brand:not(.brand-pinned) {
     visibility: hidden;
   }
 
@@ -401,7 +405,7 @@ nav.main-nav a:hover::after {
     z-index: 60;
   }
 
-  .nav-actions {
+  .site-header .nav-actions {
     visibility: hidden;
   }
 

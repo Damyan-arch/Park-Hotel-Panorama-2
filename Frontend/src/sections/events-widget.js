@@ -1,10 +1,16 @@
-import { state } from "../state.js";
+import { state, parseDateOnly, startOfToday } from "../state.js";
 import { t, pickLocalized } from "../i18n.js";
 import { escapeHtml, mediaUrl } from "../dom-utils.js";
 import { formatDateLabel } from "../date-utils.js";
 
 export function renderEventsWidget() {
-  if (!state.events.length) return "";
+  // The widget is titled "Upcoming Events", so it must not advertise ones that
+  // have already happened — those belong under the events page's Past tab. An
+  // event counts as upcoming for the whole of its own day.
+  const today = startOfToday();
+  const upcoming = state.events.filter((ev) => parseDateOnly(ev.date) >= today);
+
+  if (!upcoming.length) return "";
 
   return `<div class="events-widget">
             <div class="events-widget-head">
@@ -12,7 +18,7 @@ export function renderEventsWidget() {
               <strong>${t("events.widgetTitle")}</strong>
             </div>
             <div class="events-widget-list">
-              ${state.events
+              ${upcoming
                 .slice(0, 2)
                 .map(
                   (ev) => `
@@ -20,7 +26,7 @@ export function renderEventsWidget() {
                   ${ev.imageUrl ? `<img src="${mediaUrl(ev.imageUrl)}" alt="${escapeHtml(pickLocalized(ev.title, state.lang))}" />` : ""}
                   <div class="events-widget-item-text">
                     <strong>${escapeHtml(pickLocalized(ev.title, state.lang))}</strong>
-                    <span>${formatDateLabel(new Date(ev.date))}</span>
+                    <span>${formatDateLabel(parseDateOnly(ev.date))}</span>
                   </div>
                 </div>`
                 )

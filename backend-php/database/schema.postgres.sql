@@ -33,7 +33,8 @@ CREATE TABLE events (
   time varchar NOT NULL DEFAULT '',
   description jsonb NOT NULL,
   image_url text NOT NULL DEFAULT '',
-  info_url text NOT NULL DEFAULT ''
+  info_url text NOT NULL DEFAULT '',
+  gallery jsonb NOT NULL DEFAULT '[]'
 );
 
 CREATE TABLE amenities (

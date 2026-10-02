@@ -14,6 +14,7 @@ export const I18N = {
   en: {
     "nav.home": "Home", "nav.about": "About", "nav.leisure": "Leisure", "nav.rooms": "Rooms", "nav.restaurant": "Restaurant",
     "nav.gallery": "Gallery", "nav.location": "Location",
+    "nav.events": "Events",
     "nav.callUs": "Call Us", "nav.bookNow": "Book Now",
     "hero.eyebrow": "Boutique Mountain Retreat · Tryavna",
     "hero.title": "The Best Way to Experience Bulgaria",
@@ -47,6 +48,7 @@ export const I18N = {
     "location.subtitle": "Tucked in the Balkan Mountains, close to the old town's craft workshops, museums and riverside walks.",
     "location.address": "Address", "location.phone": "Phone", "location.getDirections": "Get Directions",
     "contact.phone": "Phone", "contact.address": "Address", "contact.followUs": "Follow us",
+    "contact.email": "Email",
     "contact.errorGeneric": "Couldn't send right now — please call us instead.",
     "booking.eyebrow": "Book Now", "booking.title": "Request Your Stay",
     "booking.subtitle": "Pick your dates, choose a room, and we'll confirm availability by phone or email.",
@@ -62,11 +64,18 @@ export const I18N = {
     "footer.explore": "Explore", "footer.contact": "Contact", "footer.rights": "All rights reserved.",
     "footer.designNote": "Design concept v2 — built for a faster, friendlier experience.",
     "fab.callNow": "Call Now",
-    "events.widgetTitle": "Upcoming Events", "events.seeMore": "See More Information"
+    "events.widgetTitle": "Upcoming Events", "events.seeMore": "See More Information",
+    "events.pageEyebrow": "What's On", "events.pageTitle": "Events at Park Hotel Panorama",
+    "events.pageSubtitle": "Seasonal gatherings, tastings and local celebrations — see what's coming up, and look back at what we've already hosted.",
+    "events.tabUpcoming": "Upcoming", "events.tabPast": "Past",
+    "events.emptyUpcoming": "No events are scheduled right now — check back soon.",
+    "events.emptyPast": "No past events to show yet.",
+    "events.moreInfo": "More Information", "events.backHome": "Back to Home", "events.photos": "Photos"
   },
   bg: {
     "nav.home": "Начало", "nav.about": "За нас", "nav.leisure": "Отдих", "nav.rooms": "Стаи", "nav.restaurant": "Ресторант",
     "nav.gallery": "Галерия", "nav.location": "Локация",
+    "nav.events": "Събития",
     "nav.callUs": "Обадете се", "nav.bookNow": "Резервирай",
     "hero.eyebrow": "Бутиков планински хотел · Трявна",
     "hero.title": "Най-добрият начин да опознаете България",
@@ -100,6 +109,7 @@ export const I18N = {
     "location.subtitle": "Разположени в Балкана, близо до занаятчийските работилници, музеите и разходките край реката в стария град.",
     "location.address": "Адрес", "location.phone": "Телефон", "location.getDirections": "Вижте маршрут",
     "contact.phone": "Телефон", "contact.address": "Адрес", "contact.followUs": "Последвайте ни",
+    "contact.email": "Имейл",
     "contact.errorGeneric": "Не успяхме да изпратим съобщението — моля обадете се на посочения телефон.",
     "booking.eyebrow": "Резервация", "booking.title": "Заявете престой",
     "booking.subtitle": "Изберете дати и стая — ще потвърдим наличността по телефон или имейл.",
@@ -115,11 +125,18 @@ export const I18N = {
     "footer.explore": "Разгледайте", "footer.contact": "Контакти", "footer.rights": "Всички права запазени.",
     "footer.designNote": "Дизайн концепция v2 — създадена за по-бързо и приятно преживяване.",
     "fab.callNow": "Обадете се",
-    "events.widgetTitle": "Предстоящи събития", "events.seeMore": "Вижте повече информация"
+    "events.widgetTitle": "Предстоящи събития", "events.seeMore": "Вижте повече информация",
+    "events.pageEyebrow": "Събития", "events.pageTitle": "Събития в Парк Хотел Панорама",
+    "events.pageSubtitle": "Сезонни събирания, дегустации и местни празници — вижте какво предстои и разгледайте какво вече се случи при нас.",
+    "events.tabUpcoming": "Предстоящи", "events.tabPast": "Минали",
+    "events.emptyUpcoming": "В момента няма планирани събития — заповядайте отново скоро.",
+    "events.emptyPast": "Все още няма минали събития.",
+    "events.moreInfo": "Повече информация", "events.backHome": "Към началото", "events.photos": "Снимки"
   },
   de: {
     "nav.home": "Startseite", "nav.about": "Über uns", "nav.leisure": "Freizeit", "nav.rooms": "Zimmer", "nav.restaurant": "Restaurant",
     "nav.gallery": "Galerie", "nav.location": "Lage",
+    "nav.events": "Veranstaltungen",
     "nav.callUs": "Anrufen", "nav.bookNow": "Jetzt buchen",
     "hero.eyebrow": "Boutique-Berghotel · Tryavna",
     "hero.title": "Der beste Weg, Bulgarien zu erleben",
@@ -153,6 +170,7 @@ export const I18N = {
     "location.subtitle": "Im Balkangebirge gelegen, nahe den Handwerkswerkstätten, Museen und Flussspaziergängen der Altstadt.",
     "location.address": "Adresse", "location.phone": "Telefon", "location.getDirections": "Route anzeigen",
     "contact.phone": "Telefon", "contact.address": "Adresse", "contact.followUs": "Folgen Sie uns",
+    "contact.email": "E-Mail",
     "contact.errorGeneric": "Senden derzeit nicht möglich — bitte rufen Sie uns stattdessen an.",
     "booking.eyebrow": "Jetzt buchen", "booking.title": "Aufenthalt anfragen",
     "booking.subtitle": "Wählen Sie Ihre Daten und ein Zimmer — wir bestätigen die Verfügbarkeit per Telefon oder E-Mail.",
@@ -168,11 +186,18 @@ export const I18N = {
     "footer.explore": "Entdecken", "footer.contact": "Kontakt", "footer.rights": "Alle Rechte vorbehalten.",
     "footer.designNote": "Design-Konzept v2 — für ein schnelleres, freundlicheres Erlebnis entwickelt.",
     "fab.callNow": "Jetzt anrufen",
-    "events.widgetTitle": "Kommende Veranstaltungen", "events.seeMore": "Weitere Informationen"
+    "events.widgetTitle": "Kommende Veranstaltungen", "events.seeMore": "Weitere Informationen",
+    "events.pageEyebrow": "Veranstaltungen", "events.pageTitle": "Veranstaltungen im Park Hotel Panorama",
+    "events.pageSubtitle": "Saisonale Treffen, Verkostungen und lokale Feste — sehen Sie, was ansteht, und blicken Sie auf Vergangenes zurück.",
+    "events.tabUpcoming": "Bevorstehend", "events.tabPast": "Vergangen",
+    "events.emptyUpcoming": "Derzeit sind keine Veranstaltungen geplant — schauen Sie bald wieder vorbei.",
+    "events.emptyPast": "Noch keine vergangenen Veranstaltungen.",
+    "events.moreInfo": "Weitere Informationen", "events.backHome": "Zur Startseite", "events.photos": "Fotos"
   },
   es: {
     "nav.home": "Inicio", "nav.about": "Sobre nosotros", "nav.leisure": "Ocio", "nav.rooms": "Habitaciones", "nav.restaurant": "Restaurante",
     "nav.gallery": "Galería", "nav.location": "Ubicación",
+    "nav.events": "Eventos",
     "nav.callUs": "Llámanos", "nav.bookNow": "Reservar",
     "hero.eyebrow": "Retiro de montaña boutique · Tryavna",
     "hero.title": "La mejor manera de vivir Bulgaria",
@@ -206,6 +231,7 @@ export const I18N = {
     "location.subtitle": "Ubicados en los Balcanes, cerca de los talleres artesanales, museos y paseos junto al río del casco antiguo.",
     "location.address": "Dirección", "location.phone": "Teléfono", "location.getDirections": "Cómo llegar",
     "contact.phone": "Teléfono", "contact.address": "Dirección", "contact.followUs": "Síganos",
+    "contact.email": "Correo",
     "contact.errorGeneric": "No pudimos enviarlo ahora — llámenos en su lugar.",
     "booking.eyebrow": "Reservar", "booking.title": "Solicite su estancia",
     "booking.subtitle": "Elija sus fechas y una habitación — confirmaremos la disponibilidad por teléfono o correo.",
@@ -221,11 +247,18 @@ export const I18N = {
     "footer.explore": "Explorar", "footer.contact": "Contacto", "footer.rights": "Todos los derechos reservados.",
     "footer.designNote": "Concepto de diseño v2 — creado para una experiencia más rápida y cercana.",
     "fab.callNow": "Llamar ahora",
-    "events.widgetTitle": "Próximos Eventos", "events.seeMore": "Ver Más Información"
+    "events.widgetTitle": "Próximos Eventos", "events.seeMore": "Ver Más Información",
+    "events.pageEyebrow": "Agenda", "events.pageTitle": "Eventos en Park Hotel Panorama",
+    "events.pageSubtitle": "Encuentros de temporada, catas y celebraciones locales — descubre lo que viene y revive lo que ya hemos organizado.",
+    "events.tabUpcoming": "Próximos", "events.tabPast": "Pasados",
+    "events.emptyUpcoming": "No hay eventos programados por ahora — vuelve pronto.",
+    "events.emptyPast": "Todavía no hay eventos pasados.",
+    "events.moreInfo": "Más información", "events.backHome": "Volver al inicio", "events.photos": "Fotos"
   },
   ro: {
     "nav.home": "Acasă", "nav.about": "Despre noi", "nav.leisure": "Timp liber", "nav.rooms": "Camere", "nav.restaurant": "Restaurant",
     "nav.gallery": "Galerie", "nav.location": "Locație",
+    "nav.events": "Evenimente",
     "nav.callUs": "Sună-ne", "nav.bookNow": "Rezervă acum",
     "hero.eyebrow": "Refugiu montan boutique · Tryavna",
     "hero.title": "Cel mai bun mod de a descoperi Bulgaria",
@@ -259,6 +292,7 @@ export const I18N = {
     "location.subtitle": "Situați în Munții Balcani, aproape de atelierele de artizanat, muzeele și plimbările de pe malul râului din orașul vechi.",
     "location.address": "Adresă", "location.phone": "Telefon", "location.getDirections": "Vezi traseul",
     "contact.phone": "Telefon", "contact.address": "Adresă", "contact.followUs": "Urmăriți-ne",
+    "contact.email": "Email",
     "contact.errorGeneric": "Nu am putut trimite acum — vă rugăm să ne sunați.",
     "booking.eyebrow": "Rezervă acum", "booking.title": "Solicită șederea",
     "booking.subtitle": "Alegeți datele și o cameră — vom confirma disponibilitatea prin telefon sau e-mail.",
@@ -274,7 +308,13 @@ export const I18N = {
     "footer.explore": "Explorează", "footer.contact": "Contact", "footer.rights": "Toate drepturile rezervate.",
     "footer.designNote": "Concept de design v2 — creat pentru o experiență mai rapidă și mai prietenoasă.",
     "fab.callNow": "Sună acum",
-    "events.widgetTitle": "Evenimente Viitoare", "events.seeMore": "Vezi Mai Multe Informații"
+    "events.widgetTitle": "Evenimente Viitoare", "events.seeMore": "Vezi Mai Multe Informații",
+    "events.pageEyebrow": "Program", "events.pageTitle": "Evenimente la Park Hotel Panorama",
+    "events.pageSubtitle": "Întâlniri sezoniere, degustări și sărbători locale — vedeți ce urmează și retrăiți ce am găzduit deja.",
+    "events.tabUpcoming": "Viitoare", "events.tabPast": "Trecute",
+    "events.emptyUpcoming": "Momentan nu sunt evenimente programate — reveniți în curând.",
+    "events.emptyPast": "Încă nu există evenimente trecute.",
+    "events.moreInfo": "Mai multe informații", "events.backHome": "Înapoi acasă", "events.photos": "Fotografii"
   }
 };
 

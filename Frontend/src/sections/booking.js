@@ -20,6 +20,10 @@ export function renderBookingSection() {
                   <span class="icon-badge"><span class="material-symbols-outlined">call</span></span>
                   <span>${escapeHtml(state.settings.phoneNumber)}</span>
                 </a>
+                <a class="booking-contact-item" href="mailto:${escapeHtml(state.settings.email)}" aria-label="${t("contact.email")}">
+                  <span class="icon-badge"><span class="material-symbols-outlined">mail</span></span>
+                  <span>${escapeHtml(state.settings.email)}</span>
+                </a>
                 <a class="booking-contact-item" href="#location" aria-label="${t("contact.address")}">
                   <span class="icon-badge"><span class="material-symbols-outlined">location_on</span></span>
                   <span>${escapeHtml(state.settings.address)}</span>

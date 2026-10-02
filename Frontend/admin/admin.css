@@ -744,3 +744,79 @@ input {
   color: #b3392c;
   font-weight: 600;
 }
+
+/* ---------- Event photo gallery picker ---------- */
+
+.gallery-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.gallery-chips:empty {
+  display: none;
+}
+
+.gallery-chip {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.gallery-chip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-chip-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+}
+
+.gallery-chip-remove .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.gallery-chip-remove:hover {
+  background: rgba(190, 40, 40, 0.9);
+}
+
+/* ---------- Past / Upcoming tag in the events list ---------- */
+
+.event-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.event-tag.upcoming {
+  background: #e4f1e6;
+  color: #2f6b3c;
+}
+
+.event-tag.past {
+  background: #ececec;
+  color: #6a6a6a;
+}
