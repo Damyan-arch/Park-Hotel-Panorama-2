@@ -50,7 +50,16 @@ class BookingController
             'status' => 'new',
         ]);
 
-        MailService::sendBookingNotification($created);
+        // The guest sees — and the booking stores — the room name in whichever
+        // language they browsed in. The notification is read by hotel staff, so
+        // it gets the Bulgarian name instead.
+        $notification = $created;
+        $notification['roomName'] = ($room['name']['bg'] ?? '') ?: $created['roomName'];
+        MailService::sendBookingNotification($notification);
+
+        // $created, not $notification — the guest gets the room name in the
+        // language they were browsing in.
+        MailService::sendGuestBookingConfirmation($created);
 
         Response::json([
             'success' => true,

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Http\Request;
 use App\Http\Response;
 use App\Repositories\InquiryRepository;
+use App\Services\MailService;
 
 class ContactController
 {
@@ -20,7 +21,7 @@ class ContactController
             return;
         }
 
-        (new InquiryRepository())->create([
+        $created = (new InquiryRepository())->create([
             'name' => $name,
             'email' => $email,
             'phone' => $body['phone'] ?? null,
@@ -28,6 +29,8 @@ class ContactController
             'message' => $message,
             'status' => 'new',
         ]);
+
+        MailService::sendContactNotification($created);
 
         Response::json([
             'success' => true,
