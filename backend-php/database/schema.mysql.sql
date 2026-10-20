@@ -37,7 +37,8 @@ CREATE TABLE events (
   time VARCHAR(255) NOT NULL DEFAULT '',
   description JSON NOT NULL,
   image_url TEXT NOT NULL,
-  info_url TEXT NOT NULL
+  info_url TEXT NOT NULL,
+  gallery JSON NULL
 );
 
 CREATE TABLE amenities (
@@ -58,7 +59,7 @@ CREATE TABLE booking_requests (
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(255),
   status VARCHAR(255) NOT NULL DEFAULT 'new',
-  received_at DATETIME NOT NULL,
+  received_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
 );
 
@@ -70,7 +71,7 @@ CREATE TABLE contact_inquiries (
   room_name TEXT,
   message TEXT NOT NULL,
   status VARCHAR(255) NOT NULL DEFAULT 'new',
-  received_at DATETIME NOT NULL
+  received_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE admin_sessions (

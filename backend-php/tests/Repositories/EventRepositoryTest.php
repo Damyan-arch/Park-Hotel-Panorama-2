@@ -58,6 +58,25 @@ class EventRepositoryTest extends TestCase
         $this->assertNull($repo->find($created['id']));
     }
 
+    public function testGalleryRoundTripsAsAList(): void
+    {
+        $repo = new EventRepository();
+        $created = $repo->create($this->sampleEvent(['gallery' => ['/images/uploads/a.webp', '/images/uploads/b.webp']]));
+        $this->assertEquals(['/images/uploads/a.webp', '/images/uploads/b.webp'], $created['gallery']);
+
+        // A list, not a {"0": ...} map — the localized-field encoder would have
+        // objectified it, which breaks .map() on the events page.
+        $updated = $repo->update($created['id'], ['gallery' => ['/images/uploads/c.webp']]);
+        $this->assertEquals([0], array_keys($updated['gallery']));
+        $this->assertEquals(['/images/uploads/c.webp'], $updated['gallery']);
+    }
+
+    public function testGalleryDefaultsToEmptyList(): void
+    {
+        $created = (new EventRepository())->create($this->sampleEvent());
+        $this->assertEquals([], $created['gallery']);
+    }
+
     public function testUpdateReturnsNullForUnknownId(): void
     {
         $this->assertNull((new EventRepository())->update('unknown-id', ['time' => '20:00']));

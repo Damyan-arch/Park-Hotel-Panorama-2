@@ -19,11 +19,17 @@ class AdminLeadsController
         Response::json((new InquiryRepository())->all());
     }
 
+    private const BOOKING_STATUSES = ['new', 'contacted', 'rejected'];
+
     public function updateBookingStatus(Request $request): void
     {
         $status = $request->json()['status'] ?? null;
         if (!$status) {
             Response::error('Status is required.');
+            return;
+        }
+        if (!in_array($status, self::BOOKING_STATUSES, true)) {
+            Response::error('Invalid status.');
             return;
         }
 

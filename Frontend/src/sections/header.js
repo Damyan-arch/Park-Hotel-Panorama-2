@@ -9,6 +9,7 @@ export function renderHeader() {
         <div class="topbar-links">
           <a href="tel:+359897820065"><span class="material-symbols-outlined">call</span> +359 897 820 065</a>
           <a href="#location"><span class="material-symbols-outlined">location_on</span> Tryavna, Bulgaria</a>
+          <a href="mailto:${escapeHtml(state.settings.email)}"><span class="material-symbols-outlined">mail</span> ${escapeHtml(state.settings.email)}</a>
         </div>
         <div class="topbar-right">
           <div class="topbar-links">
@@ -45,6 +46,7 @@ export function renderHeader() {
           <a href="#rooms">${t("nav.rooms")}</a>
           <a href="#restaurant">${t("nav.restaurant")}</a>
           <a href="#gallery">${t("nav.gallery")}</a>
+          <a href="/events/">${t("nav.events")}</a>
           <a href="#location">${t("nav.location")}</a>
         </nav>
         <div class="nav-actions">

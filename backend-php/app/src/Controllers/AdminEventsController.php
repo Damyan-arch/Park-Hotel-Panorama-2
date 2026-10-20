@@ -27,6 +27,7 @@ class AdminEventsController
             'description' => TranslateService::translateToAllLanguages($body['description'] ?? ''),
             'imageUrl' => $body['imageUrl'] ?? '',
             'infoUrl' => $body['infoUrl'] ?? '',
+            'gallery' => $body['gallery'] ?? [],
         ]);
 
         Response::json($event, 201);
@@ -44,7 +45,7 @@ class AdminEventsController
 
         $body = $request->json();
         $patch = [];
-        foreach (['title', 'date', 'time', 'description', 'imageUrl', 'infoUrl'] as $field) {
+        foreach (['title', 'date', 'time', 'description', 'imageUrl', 'infoUrl', 'gallery'] as $field) {
             if (array_key_exists($field, $body)) $patch[$field] = $body[$field];
         }
 

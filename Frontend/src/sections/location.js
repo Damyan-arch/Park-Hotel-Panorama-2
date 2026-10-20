@@ -18,6 +18,10 @@ export function renderLocation() {
               <span class="material-symbols-outlined">call</span>
               <div><strong>${t("location.phone")}</strong><span>${escapeHtml(state.settings.phoneNumber)}</span></div>
             </div>
+            <div class="location-fact">
+              <span class="material-symbols-outlined">mail</span>
+              <div><strong>${t("contact.email")}</strong><a href="mailto:${escapeHtml(state.settings.email)}">${escapeHtml(state.settings.email)}</a></div>
+            </div>
             <a class="btn btn-gold" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(state.settings.mapQuery)}">
               <span class="material-symbols-outlined">directions</span> ${t("location.getDirections")}
             </a>

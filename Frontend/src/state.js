@@ -6,6 +6,7 @@ export const FALLBACK_SETTINGS = {
   hotelName: "Park Hotel Panorama",
   phoneNumber: "+359 897 820 065",
   phoneHref: "tel:+359897820065",
+  email: "panorama.tryavna@gmail.com",
   address: "Tryavna, Bulgaria",
   mapQuery: "Park Hotel Panorama, Tryavna, Bulgaria",
   facebookUrl: "https://www.facebook.com/",
@@ -49,3 +50,21 @@ export const state = {
   events: [],
   booking: { checkIn: null, checkOut: null, roomId: "", calendarMonth: startOfMonth(new Date()) }
 };
+
+// Event dates are plain YYYY-MM-DD calendar days. `new Date("2026-10-02")`
+// parses that as UTC midnight, so comparing it against local midnight — or
+// formatting it — shifts the day backwards for viewers west of UTC (an event
+// dated today landed under "Past" in New York, and rendered as the day before).
+// Parsing the parts explicitly makes the date mean the same calendar day in
+// every timezone. Lives here rather than in date-utils.js because the admin
+// bundle needs it and date-utils.js pulls in the whole i18n table.
+export function parseDateOnly(dateStr) {
+  const [y, m, d] = String(dateStr).slice(0, 10).split("-").map(Number);
+  if (!y || !m || !d) return new Date(NaN);
+  return new Date(y, m - 1, d);
+}
+
+export function startOfToday() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}

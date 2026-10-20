@@ -27,8 +27,8 @@ class EventRepository
     {
         $id = $event['id'] ?? Uuid::v4();
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO events (id, title, date, time, description, image_url, info_url)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO events (id, title, date, time, description, image_url, info_url, gallery)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $id,
@@ -38,6 +38,7 @@ class EventRepository
             json_encode((object) $event['description']),
             $event['imageUrl'],
             $event['infoUrl'],
+            self::encodeGallery($event['gallery'] ?? []),
         ]);
         return $this->find($id);
     }
@@ -49,6 +50,7 @@ class EventRepository
         $dbColumn = [
             'title' => 'title', 'date' => 'date', 'time' => 'time',
             'description' => 'description', 'imageUrl' => 'image_url', 'infoUrl' => 'info_url',
+            'gallery' => 'gallery',
         ];
         $jsonFields = ['title', 'description'];
 
@@ -57,7 +59,11 @@ class EventRepository
         foreach ($patch as $field => $value) {
             if (!isset($dbColumn[$field])) continue;
             $sets[] = $dbColumn[$field] . ' = ?';
-            $params[] = in_array($field, $jsonFields, true) ? json_encode((object) $value) : $value;
+            if ($field === 'gallery') {
+                $params[] = self::encodeGallery($value);
+            } else {
+                $params[] = in_array($field, $jsonFields, true) ? json_encode((object) $value) : $value;
+            }
         }
         if ($sets) {
             $params[] = $id;
@@ -75,6 +81,17 @@ class EventRepository
         return $stmt->rowCount() > 0;
     }
 
+    // Always a JSON *array* of image paths — the (object) cast used for the
+    // localized fields would rewrite a list as {"0": "...", "1": "..."}.
+    private static function encodeGallery($gallery): string
+    {
+        $urls = array_values(array_filter(
+            array_map('strval', is_array($gallery) ? $gallery : []),
+            static fn ($url) => $url !== ''
+        ));
+        return json_encode($urls);
+    }
+
     private function toArray(array $row): array
     {
         return [
@@ -85,6 +102,9 @@ class EventRepository
             'description' => json_decode($row['description'], true),
             'imageUrl' => $row['image_url'],
             'infoUrl' => $row['info_url'],
+            // The column is nullable on MySQL (no DEFAULT allowed on JSON), so
+            // rows created before the gallery migration decode to null.
+            'gallery' => json_decode($row['gallery'] ?? '[]', true) ?: [],
         ];
     }
 }
