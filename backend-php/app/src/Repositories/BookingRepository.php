@@ -24,11 +24,14 @@ class BookingRepository
     public function create(array $booking): array
     {
         $id = Database::insertReturningId(
-            'INSERT INTO booking_requests (room_id, room_name, check_in, check_out, name, email, phone, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO booking_requests (room_id, room_name, check_in, check_out, name, email, phone, nights, price_per_night, total_price, currency, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $booking['roomId'], $booking['roomName'], $booking['checkIn'], $booking['checkOut'],
-                $booking['name'], $booking['email'], $booking['phone'], $booking['status'],
+                $booking['name'], $booking['email'], $booking['phone'],
+                $booking['nights'] ?? null, $booking['pricePerNight'] ?? null,
+                $booking['totalPrice'] ?? null, $booking['currency'] ?? null,
+                $booking['status'],
             ]
         );
         return $this->find((int) $id);
@@ -53,6 +56,11 @@ class BookingRepository
             'name' => $row['name'],
             'email' => $row['email'],
             'phone' => $row['phone'],
+            // Null for requests made before prices were recorded.
+            'nights' => $row['nights'] === null ? null : (int) $row['nights'],
+            'pricePerNight' => $row['price_per_night'] === null ? null : (float) $row['price_per_night'],
+            'totalPrice' => $row['total_price'] === null ? null : (float) $row['total_price'],
+            'currency' => $row['currency'],
             'status' => $row['status'],
             'receivedAt' => $row['received_at'],
         ];

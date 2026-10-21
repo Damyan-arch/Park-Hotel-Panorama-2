@@ -1,7 +1,7 @@
 import { state, startOfMonth } from "../state.js";
 import { t, LOCALE_MAP, pickLocalized } from "../i18n.js";
 import { API_BASE, escapeHtml } from "../dom-utils.js";
-import { formatDate, formatDateLabel, isSameDay } from "../date-utils.js";
+import { formatDate, formatDateLabel, isSameDay, nightsBetween } from "../date-utils.js";
 import { FACEBOOK_ICON_SVG } from "../icons.js";
 
 export function renderBookingSection() {
@@ -115,6 +115,16 @@ export function renderBookingWidget() {
     ? `${escapeHtml(pickLocalized(selectedRoom.name, state.lang))} — €${selectedRoom.basePricePerNight}${t("rooms.perNight")}`
     : t("booking.selectRoom");
 
+  // Preview only — the server recomputes the real quote from the room's stored price.
+  const nights = nightsBetween(checkIn, checkOut);
+  const priceSummary =
+    selectedRoom && nights > 0
+      ? `<div class="booking-price">
+          <span>${nights} ${t(nights === 1 ? "booking.night" : "booking.nights")} × €${selectedRoom.basePricePerNight}</span>
+          <strong>${t("booking.total")}: €${Math.round(nights * selectedRoom.basePricePerNight * 100) / 100}</strong>
+        </div>`
+      : "";
+
   root.innerHTML = `
     <div class="booking-widget-row">
     <div class="booking-card">
@@ -203,6 +213,7 @@ export function renderBookingWidget() {
           <input id="bookingPhone" name="phone" type="tel" placeholder="+359 ..." />
         </div>
       </div>
+      ${priceSummary}
       <button class="btn btn-gold" type="submit">
         <span class="material-symbols-outlined">event_available</span> ${t("booking.submit")}
       </button>

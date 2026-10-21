@@ -278,6 +278,14 @@ function statusLabel(status) {
   return "Rejected";
 }
 
+// Requests made before prices were recorded have no quote, so show nothing.
+function bookingPriceHtml(entry) {
+  if (entry.totalPrice == null || !entry.nights) return "";
+  const currency = entry.currency || "EUR";
+  const nightsLabel = `${entry.nights} ${entry.nights === 1 ? "night" : "nights"}`;
+  return `<span><span class="material-symbols-outlined">payments</span>${nightsLabel} × ${entry.pricePerNight} ${escapeHtml(currency)} = <strong>${entry.totalPrice} ${escapeHtml(currency)}</strong></span>`;
+}
+
 function renderEntryCard(kind, entry) {
   const isBooking = kind === "bookings";
   return `
@@ -289,6 +297,7 @@ function renderEntryCard(kind, entry) {
           ${entry.phone ? `<span><span class="material-symbols-outlined">call</span>${escapeHtml(entry.phone)}</span>` : ""}
           ${isBooking ? `<span><span class="material-symbols-outlined">bed</span>${escapeHtml(entry.roomName)}</span>` : ""}
           ${isBooking ? `<span><span class="material-symbols-outlined">event</span>${escapeHtml(entry.checkIn)} → ${escapeHtml(entry.checkOut)}</span>` : ""}
+          ${isBooking ? bookingPriceHtml(entry) : ""}
           <span><span class="material-symbols-outlined">schedule</span>${formatDateTime(entry.receivedAt)}</span>
         </div>
         ${!isBooking ? `<div class="entry-message">${escapeHtml(entry.message)}</div>` : ""}

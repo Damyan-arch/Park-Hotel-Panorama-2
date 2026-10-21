@@ -58,6 +58,10 @@ CREATE TABLE booking_requests (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(255),
+  nights INT UNSIGNED,
+  price_per_night NUMERIC(10,2),
+  total_price NUMERIC(10,2),
+  currency VARCHAR(8),
   status VARCHAR(255) NOT NULL DEFAULT 'new',
   received_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL

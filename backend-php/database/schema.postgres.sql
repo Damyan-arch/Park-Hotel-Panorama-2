@@ -54,6 +54,10 @@ CREATE TABLE booking_requests (
   name varchar NOT NULL,
   email varchar NOT NULL,
   phone varchar,
+  nights integer,
+  price_per_night numeric(10,2),
+  total_price numeric(10,2),
+  currency varchar,
   status varchar NOT NULL DEFAULT 'new',
   received_at timestamptz NOT NULL DEFAULT now()
 );

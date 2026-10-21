@@ -7,6 +7,7 @@ use App\Http\Response;
 use App\Repositories\BookingRepository;
 use App\Repositories\RoomRepository;
 use App\Services\MailService;
+use App\Services\PriceQuote;
 
 class BookingController
 {
@@ -39,7 +40,11 @@ class BookingController
 
         $bookingRoomName = $roomName ?: ($room['name']['en'] ?? '');
 
-        $created = (new BookingRepository())->create([
+        // Snapshot of the quote at request time, so a later price change in the
+        // admin doesn't rewrite what the guest was told.
+        $quote = PriceQuote::calculate($checkIn, $checkOut, (float) $room['basePricePerNight']);
+
+        $created = (new BookingRepository())->create($quote + [
             'roomId' => $roomId,
             'roomName' => $bookingRoomName,
             'checkIn' => $checkIn,
@@ -47,6 +52,7 @@ class BookingController
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
+            'currency' => $room['currency'] ?? 'EUR',
             'status' => 'new',
         ]);
 
