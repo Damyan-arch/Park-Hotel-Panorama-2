@@ -6,6 +6,7 @@
 use App\Controllers\PublicController;
 use App\Controllers\ContactController;
 use App\Controllers\BookingController;
+use App\Controllers\PaymentController;
 use App\Controllers\AdminAuthController;
 use App\Controllers\AdminLeadsController;
 use App\Controllers\AdminUploadController;
@@ -25,6 +26,10 @@ return [
 
     ['POST', '/contact', [ContactController::class, 'create']],
     ['POST', '/bookings', [BookingController::class, 'create']],
+    ['GET', '/payment-config', [PaymentController::class, 'config']],
+    ['POST', '/payment-intents', [PaymentController::class, 'createIntent']],
+    ['POST', '/checkout-sessions', [PaymentController::class, 'createCheckout']],
+    ['POST', '/bookings/complete', [BookingController::class, 'complete']],
 
     ['POST', '/admin/login', [AdminAuthController::class, 'login']],
     ['POST', '/admin/logout', [AdminAuthController::class, 'logout'], 'admin'],

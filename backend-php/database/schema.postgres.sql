@@ -58,6 +58,9 @@ CREATE TABLE booking_requests (
   price_per_night numeric(10,2),
   total_price numeric(10,2),
   currency varchar,
+  payment_intent_id varchar UNIQUE,
+  deposit_amount numeric(10,2),
+  payment_status varchar,
   status varchar NOT NULL DEFAULT 'new',
   received_at timestamptz NOT NULL DEFAULT now()
 );

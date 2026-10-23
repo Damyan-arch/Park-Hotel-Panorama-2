@@ -17,6 +17,14 @@ class PriceQuote
         return (int) $in->diff($out)->days;
     }
 
+    // Share of the total taken up front as a card deposit.
+    public const DEPOSIT_PERCENT = 30;
+
+    public static function deposit(float $totalPrice): float
+    {
+        return round($totalPrice * self::DEPOSIT_PERCENT / 100, 2);
+    }
+
     public static function calculate(string $checkIn, string $checkOut, float $pricePerNight): array
     {
         $nights = self::nights($checkIn, $checkOut);

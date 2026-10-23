@@ -123,6 +123,16 @@ class MailService
             if ($price = self::priceSummary($booking, 'bg')) {
                 $lines[] = "Цена: $price";
             }
+            if (($booking['depositAmount'] ?? null) !== null) {
+                $lines[] = sprintf(
+                    'Депозит %d%%: %s — блокиран по картата, не е таксуван (Stripe: %s)',
+                    PriceQuote::DEPOSIT_PERCENT,
+                    self::formatMoney((float) $booking['depositAmount'], $booking['currency'] ?? null),
+                    $booking['paymentIntentId'] ?? '—'
+                );
+            } elseif (StripeService::isEnabled()) {
+                $lines[] = 'Депозит: няма — гостът не е платил онлайн';
+            }
             $lines = array_merge($lines, [
                 "Гост: {$booking['name']}",
                 "Имейл: {$booking['email']}",
@@ -176,6 +186,12 @@ class MailService
             if ($price = self::priceSummary($booking, 'bg')) {
                 $lines[] = "Обща цена: $price";
             }
+            if (($booking['depositAmount'] ?? null) !== null) {
+                $deposit = self::formatMoney((float) $booking['depositAmount'], $booking['currency'] ?? null);
+                $lines[] = "Блокирана сума по картата (депозит): $deposit";
+                $lines[] = 'Тя се таксува само ако потвърдим резервацията;';
+                $lines[] = 'в противен случай блокадата се освобождава.';
+            }
             $lines = array_merge($lines, [
                 '',
                 'Ако нещо трябва да се промени, отговорете на този имейл',
@@ -194,6 +210,12 @@ class MailService
             ]);
             if ($price = self::priceSummary($booking, 'en')) {
                 $lines[] = "Total price: $price";
+            }
+            if (($booking['depositAmount'] ?? null) !== null) {
+                $deposit = self::formatMoney((float) $booking['depositAmount'], $booking['currency'] ?? null);
+                $lines[] = "Amount held on your card (deposit): $deposit";
+                $lines[] = 'It is only charged if we confirm your booking;';
+                $lines[] = 'otherwise the hold is released.';
             }
             $lines = array_merge($lines, [
                 '',

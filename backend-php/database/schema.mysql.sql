@@ -62,6 +62,9 @@ CREATE TABLE booking_requests (
   price_per_night NUMERIC(10,2),
   total_price NUMERIC(10,2),
   currency VARCHAR(8),
+  payment_intent_id VARCHAR(255) UNIQUE,
+  deposit_amount NUMERIC(10,2),
+  payment_status VARCHAR(32),
   status VARCHAR(255) NOT NULL DEFAULT 'new',
   received_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL

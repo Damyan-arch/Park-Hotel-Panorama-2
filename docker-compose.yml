@@ -1,0 +1,46 @@
+# Local stack: Node.js backend + PostgreSQL.
+# Secrets come from a .env file next to this one (gitignored) — see README "Running with Docker".
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: park_hotel_panorama
+      POSTGRES_USER: park_hotel_app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U park_hotel_app -d park_hotel_panorama"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: park_hotel_panorama
+      DB_USER: park_hotel_app
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSL: "false"
+      ADMIN_EMAILS: ${ADMIN_EMAILS:?Set ADMIN_EMAILS in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      # Optional — translation and image uploads are disabled without them.
+      DEEPL_API_KEY: ${DEEPL_API_KEY:-}
+      SPACES_REGION: ${SPACES_REGION:-}
+      SPACES_BUCKET: ${SPACES_BUCKET:-}
+      SPACES_KEY: ${SPACES_KEY:-}
+      SPACES_SECRET: ${SPACES_SECRET:-}
+      SPACES_CDN_ENDPOINT: ${SPACES_CDN_ENDPOINT:-}
+    ports:
+      - "3002:3002"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
