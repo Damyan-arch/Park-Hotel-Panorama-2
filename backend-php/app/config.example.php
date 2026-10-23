@@ -14,7 +14,7 @@ return [
     ],
     'admin' => [
         // Comma-separated, case-insensitive
-        'emails' => 'damian.tsvetkov@hermeses.com',
+        'emails' => 'you@example.com',
         'password' => '', // required — the app refuses to boot without this set
     ],
     'frontend_origins' => 'http://localhost:4202',
@@ -28,6 +28,14 @@ return [
         'notify_to' => '',
         'from_email' => '',
         'from_name' => 'Park Hotel Panorama',
+    ],
+
+    // Stripe keys for the 30% card deposit (https://dashboard.stripe.com/apikeys).
+    // Use the TEST keys (pk_test_... / sk_test_...) until you go live. Leave
+    // either empty to disable online payment — bookings then work without a card.
+    'stripe' => [
+        'publishable_key' => '',
+        'secret_key' => '',
     ],
 
     // Absolute filesystem path to public_html/images/uploads on THIS server —

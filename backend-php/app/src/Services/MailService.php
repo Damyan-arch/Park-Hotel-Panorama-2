@@ -64,6 +64,30 @@ class MailService
         );
     }
 
+    // '500.0' -> '500 EUR', '99.5' -> '99.50 EUR'. Whole amounts drop the
+    // decimals, matching how the site shows room prices.
+    private static function formatMoney(float $amount, ?string $currency): string
+    {
+        $decimals = floor($amount) == $amount ? 0 : 2;
+        return number_format($amount, $decimals, '.', '') . ' ' . ($currency ?: 'EUR');
+    }
+
+    // '5 нощувки × 100 EUR = 500 EUR' / '5 nights × 100 EUR = 500 EUR'.
+    // Null for requests that carry no quote.
+    private static function priceSummary(array $booking, string $lang): ?string
+    {
+        if (($booking['totalPrice'] ?? null) === null || empty($booking['nights'])) return null;
+
+        $nights = (int) $booking['nights'];
+        $perNight = self::formatMoney((float) $booking['pricePerNight'], $booking['currency'] ?? null);
+        $total = self::formatMoney((float) $booking['totalPrice'], $booking['currency'] ?? null);
+
+        $label = $lang === 'bg'
+            ? $nights . ($nights === 1 ? ' нощувка' : ' нощувки')
+            : $nights . ($nights === 1 ? ' night' : ' nights');
+        return "$label × $perNight = $total";
+    }
+
     // A non-ASCII subject must be MIME-encoded or mail clients show mojibake.
     private static function encodeSubject(string $subject): string
     {
@@ -95,12 +119,27 @@ class MailService
                 "Стая: {$booking['roomName']}",
                 'Настаняване: ' . self::formatDateBg($booking['checkIn']),
                 'Напускане: ' . self::formatDateBg($booking['checkOut']),
+            ];
+            if ($price = self::priceSummary($booking, 'bg')) {
+                $lines[] = "Цена: $price";
+            }
+            if (($booking['depositAmount'] ?? null) !== null) {
+                $lines[] = sprintf(
+                    'Депозит %d%%: %s — блокиран по картата, не е таксуван (Stripe: %s)',
+                    PriceQuote::DEPOSIT_PERCENT,
+                    self::formatMoney((float) $booking['depositAmount'], $booking['currency'] ?? null),
+                    $booking['paymentIntentId'] ?? '—'
+                );
+            } elseif (StripeService::isEnabled()) {
+                $lines[] = 'Депозит: няма — гостът не е платил онлайн';
+            }
+            $lines = array_merge($lines, [
                 "Гост: {$booking['name']}",
                 "Имейл: {$booking['email']}",
                 'Телефон: ' . ($booking['phone'] ?: '—'),
                 '',
                 'Прегледайте я в администраторския панел, раздел Booking Requests.',
-            ];
+            ]);
 
             $headers = [
                 'From: ' . self::fromHeader(),
@@ -143,6 +182,17 @@ class MailService
                 "Стая: {$booking['roomName']}",
                 'Настаняване: ' . self::formatDateBg($booking['checkIn']),
                 'Напускане: ' . self::formatDateBg($booking['checkOut']),
+            ];
+            if ($price = self::priceSummary($booking, 'bg')) {
+                $lines[] = "Обща цена: $price";
+            }
+            if (($booking['depositAmount'] ?? null) !== null) {
+                $deposit = self::formatMoney((float) $booking['depositAmount'], $booking['currency'] ?? null);
+                $lines[] = "Блокирана сума по картата (депозит): $deposit";
+                $lines[] = 'Тя се таксува само ако потвърдим резервацията;';
+                $lines[] = 'в противен случай блокадата се освобождава.';
+            }
+            $lines = array_merge($lines, [
                 '',
                 'Ако нещо трябва да се промени, отговорете на този имейл',
                 'или ни се обадете на ' . self::$hotelPhone . '.',
@@ -157,13 +207,24 @@ class MailService
                 "Room: {$booking['roomName']}",
                 'Check-in: ' . self::formatDateEn($booking['checkIn']),
                 'Check-out: ' . self::formatDateEn($booking['checkOut']),
+            ]);
+            if ($price = self::priceSummary($booking, 'en')) {
+                $lines[] = "Total price: $price";
+            }
+            if (($booking['depositAmount'] ?? null) !== null) {
+                $deposit = self::formatMoney((float) $booking['depositAmount'], $booking['currency'] ?? null);
+                $lines[] = "Amount held on your card (deposit): $deposit";
+                $lines[] = 'It is only charged if we confirm your booking;';
+                $lines[] = 'otherwise the hold is released.';
+            }
+            $lines = array_merge($lines, [
                 '',
                 'If anything needs changing, reply to this email',
                 'or call us on ' . self::$hotelPhone . '.',
                 '',
                 'Park Hotel Panorama',
                 'Трявна, България · Tryavna, Bulgaria',
-            ];
+            ]);
 
             $headers = [
                 'From: ' . self::fromHeader(),

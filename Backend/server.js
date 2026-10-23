@@ -20,10 +20,14 @@ const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGIN || "http://localhost:4202"
   .split(",")
   .map((s) => s.trim())
   .concat([`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`]);
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "damian.tsvetkov@hermeses.com,ganka.orh@gmail.com")
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
+if (ADMIN_EMAILS.length === 0) {
+  console.error("ADMIN_EMAILS (or ADMIN_EMAIL) must be set in the environment — refusing to start without it.");
+  process.exit(1);
+}
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 if (!ADMIN_PASSWORD) {
   console.error("ADMIN_PASSWORD must be set in the environment — refusing to start without it.");

@@ -29,18 +29,33 @@ Then open **http://localhost:4202**.
 
 The frontend fetches rooms/gallery/settings from `http://localhost:3002/api/*` on load, with built-in fallback content if the API is briefly unreachable, and posts the contact form to `POST /api/contact`.
 
+## Running with Docker
+
+`docker-compose.yml` runs the Node.js backend (serving the built frontend) plus PostgreSQL. Create a `.env` file in the repo root (it's gitignored):
+
+```bash
+DB_PASSWORD=pick-a-db-password
+ADMIN_EMAILS=you@example.com
+ADMIN_PASSWORD=a-strong-password
+# Optional: DEEPL_API_KEY, SPACES_REGION, SPACES_BUCKET, SPACES_KEY, SPACES_SECRET, SPACES_CDN_ENDPOINT
+```
+
+Then:
+
+```bash
+docker compose up --build                            # builds the image, starts Postgres, runs migrations, starts the API
+docker compose exec backend npm run db:seed          # optional: import the sample content from Backend/data/db.json
+```
+
+Open **http://localhost:3002**. Database data lives in the `pgdata` volume; `docker compose down -v` wipes it.
+
 ## Staff / admin access
 
 There is no "Admin" link anywhere on the public site or in its bundled code. Front-desk staff view booking requests and contact messages by going directly to:
 
 **http://localhost:4202/admin/**
 
-Default credentials (change the password before this ever goes near a real deployment):
-
-- Email: `damian.tsvetkov@hermeses.com`
-- Password: `Lumen-Balkan-2179%`
-
-To change them, set environment variables before starting the backend:
+There are no default credentials — the backend refuses to start until both are set as environment variables:
 
 ```powershell
 $env:ADMIN_EMAIL="you@example.com"

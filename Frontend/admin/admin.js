@@ -278,6 +278,57 @@ function statusLabel(status) {
   return "Rejected";
 }
 
+// Requests made before prices were recorded have no quote, so show nothing.
+function bookingPriceHtml(entry) {
+  if (entry.totalPrice == null || !entry.nights) return "";
+  const currency = entry.currency || "EUR";
+  const nightsLabel = `${entry.nights} ${entry.nights === 1 ? "night" : "nights"}`;
+  return `<span><span class="material-symbols-outlined">payments</span>${nightsLabel} × ${entry.pricePerNight} ${escapeHtml(currency)} = <strong>${entry.totalPrice} ${escapeHtml(currency)}</strong></span>`;
+}
+
+// The 30% card deposit and where it stands. The backend refreshes held deposits
+// from Stripe on every load, so a capture or release done in the Stripe
+// dashboard shows up here. The payment ID can be copied to look it up there.
+const PAYMENT_STATES = {
+  captured: { cls: "paid", icon: "check_circle", label: "Paid" },
+  authorized: { cls: "held", icon: "schedule", label: "Held — not charged yet" },
+  canceled: { cls: "released", icon: "close", label: "Released — not charged" },
+  expired: { cls: "released", icon: "close", label: "Hold expired — not charged" },
+};
+
+function bookingDepositHtml(entry) {
+  if (entry.depositAmount == null) return `<span class="pay-status none">No online payment</span>`;
+  const currency = entry.currency || "EUR";
+  const state = PAYMENT_STATES[entry.paymentStatus] || { cls: "held", icon: "schedule", label: entry.paymentStatus || "Unknown" };
+  const id = entry.paymentIntentId || "";
+  return `
+    <span><span class="material-symbols-outlined">credit_card</span>Deposit: <strong>${entry.depositAmount} ${escapeHtml(currency)}</strong></span>
+    <span class="pay-status ${state.cls}"><span class="material-symbols-outlined">${state.icon}</span>${state.label}</span>
+    ${id ? `<button type="button" class="copy-id" data-copy="${escapeHtml(id)}" title="Copy payment ID">${escapeHtml(id)}<span class="material-symbols-outlined">content_copy</span></button>` : ""}`;
+}
+
+async function copyPaymentId(btn) {
+  const text = btn.dataset.copy;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Clipboard API unavailable (e.g. plain http on a non-localhost host).
+    const area = document.createElement("textarea");
+    area.value = text;
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+  }
+  const icon = btn.querySelector(".material-symbols-outlined");
+  btn.classList.add("copied");
+  if (icon) icon.textContent = "check_circle";
+  setTimeout(() => {
+    btn.classList.remove("copied");
+    if (icon) icon.textContent = "content_copy";
+  }, 1500);
+}
+
 function renderEntryCard(kind, entry) {
   const isBooking = kind === "bookings";
   return `
@@ -289,6 +340,8 @@ function renderEntryCard(kind, entry) {
           ${entry.phone ? `<span><span class="material-symbols-outlined">call</span>${escapeHtml(entry.phone)}</span>` : ""}
           ${isBooking ? `<span><span class="material-symbols-outlined">bed</span>${escapeHtml(entry.roomName)}</span>` : ""}
           ${isBooking ? `<span><span class="material-symbols-outlined">event</span>${escapeHtml(entry.checkIn)} → ${escapeHtml(entry.checkOut)}</span>` : ""}
+          ${isBooking ? bookingPriceHtml(entry) : ""}
+          ${isBooking ? bookingDepositHtml(entry) : ""}
           <span><span class="material-symbols-outlined">schedule</span>${formatDateTime(entry.receivedAt)}</span>
         </div>
         ${!isBooking ? `<div class="entry-message">${escapeHtml(entry.message)}</div>` : ""}
@@ -1031,6 +1084,7 @@ function wirePanelEvents() {
   panel.querySelectorAll(".status-toggle").forEach((btn) => {
     btn.addEventListener("click", () => setLeadStatus(btn.dataset.kind, Number(btn.dataset.id), btn.dataset.status));
   });
+  panel.querySelectorAll(".copy-id").forEach((btn) => btn.addEventListener("click", () => copyPaymentId(btn)));
 
   panel.querySelector("#addRoomBtn")?.addEventListener("click", () => openRoomModal());
   panel.querySelectorAll("[data-edit-room]").forEach((btn) =>

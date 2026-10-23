@@ -1340,6 +1340,388 @@ nav.main-nav a:hover::after {
   margin-top: 6px;
 }
 
+.booking-form .btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.booking-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.booking-price-row.deposit {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+.booking-price-row.deposit strong {
+  font-size: 1rem;
+}
+
+/* Two-sided card entry form, matching a card design from Uiverse.io (by
+   Jules-gitclerc): name + brand box on top, card number below, and — on the
+   back here — expiry + CVV in the row the design puts at the bottom. The
+   artwork lives in .pay-card-faces and flips with a flat scaleX squash; the
+   real inputs live in the .pay-card-fields overlays on top of it. Keep them
+   apart — see the note in payment.js. */
+.pay-card {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 190px;
+  margin: 0 auto 20px;
+  color: #fff;
+}
+
+.pay-card-faces {
+  position: absolute;
+  inset: 0;
+}
+
+.pay-card-front,
+.pay-card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background-color: #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+.pay-card-front {
+  transition: transform 0.3s ease-out 0.3s;
+}
+
+.pay-card-back {
+  transform: scaleX(0);
+  transition: transform 0.3s ease-in;
+}
+
+.pay-card.flipped .pay-card-front {
+  transform: scaleX(0);
+  transition: transform 0.3s ease-in;
+}
+
+.pay-card.flipped .pay-card-back {
+  transform: none;
+  transition: transform 0.3s ease-out 0.3s;
+}
+
+/* Input overlays. Shown/hidden with opacity (never visibility) so a hidden
+   field can still be focused. The incoming side fades in once the faces have
+   finished squashing. Rows are 40px with 19px between them, so the three row
+   positions line up with the design. */
+.pay-card-fields {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  padding: 16px;
+  pointer-events: none;
+  transition: opacity 0.1s 0.3s;
+}
+
+.pay-card-fields > * {
+  pointer-events: auto;
+}
+
+.pay-card-fields--back {
+  opacity: 0;
+  padding-top: 134px;
+}
+
+.pay-card-fields--back > * {
+  pointer-events: none;
+}
+
+.pay-card.flipped .pay-card-fields--front {
+  opacity: 0;
+  transition: none;
+}
+
+.pay-card.flipped .pay-card-fields--front > * {
+  pointer-events: none;
+}
+
+.pay-card.flipped .pay-card-fields--back {
+  opacity: 1;
+}
+
+.pay-card.flipped .pay-card-fields--back > * {
+  pointer-events: auto;
+}
+
+.pay-card:not(.flipped) .pay-card-fields--back {
+  transition: none;
+}
+
+.pay-card-row {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+.pay-card-row > * {
+  min-width: 0;
+}
+
+.pay-card .pay-card-holder {
+  flex: 1;
+  height: 40px;
+  padding: 0 0 0 8px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  caret-color: #f97316;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.pay-card .pay-card-holder::placeholder {
+  color: #9ca3af;
+}
+
+.pay-card .pay-card-holder:focus {
+  outline: none;
+}
+
+.pay-card-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 56px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.pay-card-brand-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* Stripe field containers: number on the front, expiry + CVV on the back */
+.pay-card-input {
+  position: relative;
+  flex: 1;
+  height: 40px;
+  padding: 10px 8px;
+  box-sizing: border-box;
+}
+
+/* The "0000 0000 0000 0000" placeholder of the number field. It sits under
+   Stripe's frame; each typed digit covers its zero (see payment.js), and the
+   mask goes away once the number is finished. */
+#cardNumber.pay-card-input.is-ready:not(.is-complete)::before {
+  content: "0000 0000 0000 0000";
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  color: #9ca3af;
+  font: 600 14px/17px ui-monospace, Menlo, Consolas, "Courier New", monospace;
+  letter-spacing: 0;
+  white-space: pre;
+  pointer-events: none;
+}
+
+/* "Loading…" hint in the number field until Stripe's frame is ready */
+.pay-card-input[data-loading]:not(.is-ready)::before {
+  content: attr(data-loading);
+  position: absolute;
+  left: 8px;
+  top: 11px;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pay-card-flip {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  padding: 4px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: #9ca3af;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.pay-card-flip:hover {
+  border-color: var(--gold-400);
+  color: var(--gold-400);
+}
+
+.card-error {
+  min-height: 0;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #b3392c;
+}
+
+.pay-fallback {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 16px;
+  border: 1px solid var(--gold-500);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pine-800);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pay-fallback:hover {
+  background: rgba(201, 162, 75, 0.14);
+}
+
+.pay-fallback[hidden] {
+  display: none;
+}
+
+/* "Pay the deposit online" choice under the contact fields */
+/* Same space below as the email/phone row leaves above (32px), so the
+   choice sits midway between those fields and the price / button. */
+.pay-online {
+  margin-bottom: 32px;
+}
+
+/* .contact-form prefix: outranks the form's generic "label { display: block }" */
+.contact-form .pay-online-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--ink-900);
+  cursor: pointer;
+}
+
+.pay-online-toggle input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  accent-color: var(--gold-500);
+  cursor: pointer;
+}
+
+/* The form's gold focus ring only for keyboard focus, not after a click. */
+.contact-form .pay-online-toggle input:focus {
+  outline: none;
+}
+
+.contact-form .pay-online-toggle input:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 2px;
+}
+
+/* No price box yet (no dates/room picked): the button comes right after the
+   choice, whose 32px already spaces it. */
+.contact-form .pay-online + .btn {
+  margin-top: 0;
+}
+
+.pay-online-hint {
+  margin: 8px 0 0 28px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ink-400);
+}
+
+/* Two sides of the reservation card: details on the front, the bank card on
+   the back. booking.js spins between them; only one is shown at a time. */
+.booking-face[hidden] {
+  display: none;
+}
+
+.booking-face-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: -6px 0 6px -6px;
+  padding: 4px 8px 4px 2px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-600);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.booking-face-back:hover {
+  color: var(--ink-900);
+  background: rgba(32, 30, 26, 0.05);
+}
+
+.booking-face-back .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.booking-face-summary {
+  margin: 0 0 18px;
+  font-size: 0.85rem;
+  color: var(--ink-400);
+}
+
+.booking-face--back .booking-price {
+  margin-top: 4px;
+}
+
+.pay-online-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--gold-500);
+}
+
+.card-note {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ink-400);
+}
+
+.booking-price {
+  margin: 18px 0 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--cream-100);
+  color: var(--ink-600);
+  font-size: 0.92rem;
+}
+
+.booking-price strong {
+  color: var(--pine-800);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
 .form-status {
   margin-top: 14px;
   font-size: 0.9rem;

@@ -21,14 +21,26 @@ class BookingRepository
         return $row === false ? null : $this->toArray($row);
     }
 
+    public function existsByPaymentIntent(string $paymentIntentId): bool
+    {
+        $stmt = Database::pdo()->prepare('SELECT 1 FROM booking_requests WHERE payment_intent_id = ?');
+        $stmt->execute([$paymentIntentId]);
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function create(array $booking): array
     {
         $id = Database::insertReturningId(
-            'INSERT INTO booking_requests (room_id, room_name, check_in, check_out, name, email, phone, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO booking_requests (room_id, room_name, check_in, check_out, name, email, phone, nights, price_per_night, total_price, currency, payment_intent_id, deposit_amount, payment_status, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $booking['roomId'], $booking['roomName'], $booking['checkIn'], $booking['checkOut'],
-                $booking['name'], $booking['email'], $booking['phone'], $booking['status'],
+                $booking['name'], $booking['email'], $booking['phone'],
+                $booking['nights'] ?? null, $booking['pricePerNight'] ?? null,
+                $booking['totalPrice'] ?? null, $booking['currency'] ?? null,
+                $booking['paymentIntentId'] ?? null, $booking['depositAmount'] ?? null,
+                $booking['paymentStatus'] ?? null,
+                $booking['status'],
             ]
         );
         return $this->find((int) $id);
@@ -42,6 +54,12 @@ class BookingRepository
         return $this->find($id);
     }
 
+    public function updatePaymentStatus(int $id, string $paymentStatus): void
+    {
+        $stmt = Database::pdo()->prepare('UPDATE booking_requests SET payment_status = ? WHERE id = ?');
+        $stmt->execute([$paymentStatus, $id]);
+    }
+
     private function toArray(array $row): array
     {
         return [
@@ -53,6 +71,15 @@ class BookingRepository
             'name' => $row['name'],
             'email' => $row['email'],
             'phone' => $row['phone'],
+            // Null for requests made before prices were recorded.
+            'nights' => $row['nights'] === null ? null : (int) $row['nights'],
+            'pricePerNight' => $row['price_per_night'] === null ? null : (float) $row['price_per_night'],
+            'totalPrice' => $row['total_price'] === null ? null : (float) $row['total_price'],
+            'currency' => $row['currency'],
+            // Card deposit held at request time; null when none was taken.
+            'paymentIntentId' => $row['payment_intent_id'],
+            'depositAmount' => $row['deposit_amount'] === null ? null : (float) $row['deposit_amount'],
+            'paymentStatus' => $row['payment_status'],
             'status' => $row['status'],
             'receivedAt' => $row['received_at'],
         ];

@@ -53,6 +53,38 @@ class BookingRepositoryTest extends TestCase
         $this->assertNotNull($found['receivedAt']);
     }
 
+    public function testPriceQuoteRoundTrips(): void
+    {
+        $repo = new BookingRepository();
+        $created = $repo->create($this->sampleBooking([
+            'nights' => 5, 'pricePerNight' => 100.0, 'totalPrice' => 500.0, 'currency' => 'EUR',
+        ]));
+
+        $this->assertSame(5, $created['nights']);
+        $this->assertEquals(100.0, $created['pricePerNight']);
+        $this->assertEquals(500.0, $created['totalPrice']);
+        $this->assertEquals('EUR', $created['currency']);
+    }
+
+    public function testBookingWithoutQuoteHasNullPrice(): void
+    {
+        $created = (new BookingRepository())->create($this->sampleBooking());
+
+        $this->assertNull($created['nights']);
+        $this->assertNull($created['totalPrice']);
+    }
+
+    public function testUpdatePaymentStatus(): void
+    {
+        $repo = new BookingRepository();
+        $created = $repo->create($this->sampleBooking([
+            'paymentIntentId' => 'pi_test_1', 'depositAmount' => 15.0, 'paymentStatus' => 'authorized',
+        ]));
+
+        $repo->updatePaymentStatus($created['id'], 'captured');
+        $this->assertEquals('captured', $repo->find($created['id'])['paymentStatus']);
+    }
+
     public function testAllOrdersNewestFirst(): void
     {
         $repo = new BookingRepository();
