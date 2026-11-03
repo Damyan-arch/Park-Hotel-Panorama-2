@@ -137,4 +137,37 @@ class StripeServiceTest extends TestCase
         $this->assertEquals('expired', StripeService::depositStatus(['status' => 'canceled', 'cancellation_reason' => 'automatic']));
         $this->assertNull(StripeService::depositStatus(['status' => 'processing']));
     }
+
+    public function testCaptureAndCancelPostToTheIntent(): void
+    {
+        $calls = [];
+        StripeService::setTransport(function ($method, $path, $params) use (&$calls) {
+            $calls[] = "$method $path";
+            return ['id' => 'pi_1', 'status' => 'succeeded'];
+        });
+
+        StripeService::captureIntent('pi_1');
+        StripeService::cancelIntent('pi_1');
+        $this->assertEquals(['POST /payment_intents/pi_1/capture', 'POST /payment_intents/pi_1/cancel'], $calls);
+    }
+
+    public function testDashboardUrlFollowsTheKeyMode(): void
+    {
+        StripeService::init(['publishable_key' => 'pk_test_x', 'secret_key' => 'sk_test_x']);
+        $this->assertEquals('https://dashboard.stripe.com/acct_1/test/payments/pi_1', StripeService::dashboardPaymentUrl('pi_1', 'acct_1'));
+
+        StripeService::init(['publishable_key' => 'pk_live_x', 'secret_key' => 'sk_live_x']);
+        $this->assertEquals('https://dashboard.stripe.com/acct_1/payments/pi_1', StripeService::dashboardPaymentUrl('pi_1', 'acct_1'));
+        $this->assertEquals('https://dashboard.stripe.com/payments/pi_1', StripeService::dashboardPaymentUrl('pi_1'));
+    }
+
+    public function testCardIsNotOfferedToGuestsWhileSwitchedOff(): void
+    {
+        StripeService::init(['publishable_key' => 'pk_test_x', 'secret_key' => 'sk_test_x']);
+        $this->assertTrue(StripeService::isEnabled()); // the admin can still manage card deposits
+        $this->assertEquals(StripeService::OFFER_CARD_PAYMENTS, StripeService::cardOffered());
+
+        StripeService::init([]);
+        $this->assertFalse(StripeService::cardOffered());
+    }
 }

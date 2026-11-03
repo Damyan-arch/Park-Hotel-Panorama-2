@@ -278,6 +278,26 @@ function statusLabel(status) {
   return "Rejected";
 }
 
+// Who the stay is for: the total, then every kind of guest — zeros included
+// (dimmed), so "no children" is stated rather than left to be inferred.
+function bookingGuestsHtml(entry) {
+  if (entry.adults == null) {
+    return `<div class="entry-guests"><span class="entry-guests-total muted"><span class="material-symbols-outlined">group</span>Guests not recorded (older request)</span></div>`;
+  }
+  const total = entry.adults + entry.children + entry.babies;
+  const kinds = [
+    ["Adults", "18+", entry.adults],
+    ["Children", "4–17", entry.children],
+    ["Babies", "0–3", entry.babies]
+  ];
+  return `<div class="entry-guests">
+      <span class="entry-guests-total"><span class="material-symbols-outlined">group</span>${total} ${total === 1 ? "guest" : "guests"}</span>
+      ${kinds
+        .map(([label, ages, n]) => `<span class="guest-pill${n ? "" : " is-zero"}">${label} <small>${ages}</small><strong>${n}</strong></span>`)
+        .join("")}
+    </div>`;
+}
+
 // Requests made before prices were recorded have no quote, so show nothing.
 function bookingPriceHtml(entry) {
   if (entry.totalPrice == null || !entry.nights) return "";
@@ -294,17 +314,105 @@ const PAYMENT_STATES = {
   authorized: { cls: "held", icon: "schedule", label: "Held — not charged yet" },
   canceled: { cls: "released", icon: "close", label: "Released — not charged" },
   expired: { cls: "released", icon: "close", label: "Hold expired — not charged" },
+  awaiting_transfer: { cls: "held", icon: "schedule", label: "Bank transfer — not received yet" },
+  transfer_received: { cls: "paid", icon: "check_circle", label: "Bank transfer received" },
 };
+
+const isBankTransfer = (entry) => entry.paymentStatus === "awaiting_transfer" || entry.paymentStatus === "transfer_received";
 
 function bookingDepositHtml(entry) {
   if (entry.depositAmount == null) return `<span class="pay-status none">No online payment</span>`;
   const currency = entry.currency || "EUR";
   const state = PAYMENT_STATES[entry.paymentStatus] || { cls: "held", icon: "schedule", label: entry.paymentStatus || "Unknown" };
   const id = entry.paymentIntentId || "";
+  if (isBankTransfer(entry)) {
+    return `
+    <span><span class="material-symbols-outlined">payments</span>Deposit by bank transfer: <strong>${entry.depositAmount} ${escapeHtml(currency)}</strong></span>
+    <span class="pay-status ${state.cls}"><span class="material-symbols-outlined">${state.icon}</span>${state.label}</span>
+    <button type="button" class="copy-id" data-copy="Booking ${entry.id}" title="Payment reference the guest was given — copy">Booking ${entry.id}<span class="material-symbols-outlined">content_copy</span></button>`;
+  }
   return `
     <span><span class="material-symbols-outlined">credit_card</span>Deposit: <strong>${entry.depositAmount} ${escapeHtml(currency)}</strong></span>
     <span class="pay-status ${state.cls}"><span class="material-symbols-outlined">${state.icon}</span>${state.label}</span>
     ${id ? `<button type="button" class="copy-id" data-copy="${escapeHtml(id)}" title="Copy payment ID">${escapeHtml(id)}<span class="material-symbols-outlined">content_copy</span></button>` : ""}`;
+}
+
+// Stripe lets a held deposit lapse about 7 days after the request.
+const HOLD_DAYS = 7;
+
+// Take the money / drop the hold right from the booking, plus a link to the
+// payment in the Stripe dashboard. Shown under the booking's details.
+function bookingDepositActions(entry) {
+  if (isBankTransfer(entry)) {
+    return entry.paymentStatus === "awaiting_transfer"
+      ? `<div class="deposit-actions">
+          <button type="button" class="deposit-btn capture" data-transfer="1" data-id="${entry.id}">
+            <span class="material-symbols-outlined">check_circle</span>Mark as received
+          </button>
+          <span class="deposit-deadline">Check the bank account for a transfer with reference “Booking ${entry.id}”.</span>
+        </div>`
+      : `<div class="deposit-actions">
+          <button type="button" class="deposit-undo" data-transfer="0" data-id="${entry.id}">Undo — not received</button>
+        </div>`;
+  }
+  if (entry.depositAmount == null || !entry.paymentIntentId) return "";
+  const link = entry.paymentUrl
+    ? `<a class="deposit-link" href="${escapeHtml(entry.paymentUrl)}" target="_blank" rel="noopener"><span class="material-symbols-outlined">open_in_new</span>Open in Stripe</a>`
+    : "";
+  if (entry.paymentStatus !== "authorized") return link ? `<div class="deposit-actions">${link}</div>` : "";
+
+  const lapses = new Date(new Date(entry.receivedAt).getTime() + HOLD_DAYS * 86400000);
+  const amount = `${entry.depositAmount} ${escapeHtml(entry.currency || "EUR")}`;
+  return `
+    <div class="deposit-actions">
+      <button type="button" class="deposit-btn capture" data-deposit="capture" data-id="${entry.id}">
+        <span class="material-symbols-outlined">payments</span>Take payment · ${amount}
+      </button>
+      <button type="button" class="deposit-btn release" data-deposit="release" data-id="${entry.id}">
+        <span class="material-symbols-outlined">close</span>Release hold
+      </button>
+      ${link}
+      <span class="deposit-deadline">Decide by ${lapses.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} — after that the hold is released by itself.</span>
+    </div>`;
+}
+
+async function markTransfer(btn) {
+  const entry = state.bookings.find((e) => e.id === Number(btn.dataset.id));
+  if (!entry) return;
+  const received = btn.dataset.transfer === "1";
+  if (received && !confirm(`Mark the ${entry.depositAmount} ${entry.currency || "EUR"} transfer from ${entry.name} as received?`)) return;
+  btn.disabled = true;
+  try {
+    Object.assign(entry, await apiFetch(`/admin/bookings/${entry.id}/transfer`, { method: "POST", body: JSON.stringify({ received }) }));
+    render();
+  } catch (err) {
+    alert(err.message);
+    btn.disabled = false;
+  }
+}
+
+async function settleDeposit(btn) {
+  const entry = state.bookings.find((e) => e.id === Number(btn.dataset.id));
+  if (!entry) return;
+  const amount = `${entry.depositAmount} ${entry.currency || "EUR"}`;
+  const question =
+    btn.dataset.deposit === "capture"
+      ? `Charge ${amount} to ${entry.name}'s card now?\n\nThe money goes to your Stripe balance and is paid out to the bank.`
+      : `Release the ${amount} hold on ${entry.name}'s card?\n\nThey won't be charged, and this can't be undone.`;
+  if (!confirm(question)) return;
+
+  const actions = btn.closest(".deposit-actions");
+  actions?.querySelectorAll("button").forEach((b) => (b.disabled = true));
+  btn.classList.add("busy");
+  try {
+    const updated = await apiFetch(`/admin/bookings/${entry.id}/${btn.dataset.deposit}`, { method: "POST" });
+    Object.assign(entry, updated);
+    render();
+  } catch (err) {
+    alert(err.message);
+    actions?.querySelectorAll("button").forEach((b) => (b.disabled = false));
+    btn.classList.remove("busy");
+  }
 }
 
 async function copyPaymentId(btn) {
@@ -344,6 +452,8 @@ function renderEntryCard(kind, entry) {
           ${isBooking ? bookingDepositHtml(entry) : ""}
           <span><span class="material-symbols-outlined">schedule</span>${formatDateTime(entry.receivedAt)}</span>
         </div>
+        ${isBooking ? bookingGuestsHtml(entry) : ""}
+        ${isBooking ? bookingDepositActions(entry) : ""}
         ${!isBooking ? `<div class="entry-message">${escapeHtml(entry.message)}</div>` : ""}
       </div>
       <div class="entry-side">
@@ -1085,6 +1195,8 @@ function wirePanelEvents() {
     btn.addEventListener("click", () => setLeadStatus(btn.dataset.kind, Number(btn.dataset.id), btn.dataset.status));
   });
   panel.querySelectorAll(".copy-id").forEach((btn) => btn.addEventListener("click", () => copyPaymentId(btn)));
+  panel.querySelectorAll(".deposit-btn[data-deposit]").forEach((btn) => btn.addEventListener("click", () => settleDeposit(btn)));
+  panel.querySelectorAll("[data-transfer]").forEach((btn) => btn.addEventListener("click", () => markTransfer(btn)));
 
   panel.querySelector("#addRoomBtn")?.addEventListener("click", () => openRoomModal());
   panel.querySelectorAll("[data-edit-room]").forEach((btn) =>

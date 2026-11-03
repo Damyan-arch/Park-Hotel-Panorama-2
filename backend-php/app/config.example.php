@@ -38,6 +38,23 @@ return [
         'secret_key' => '',
     ],
 
+    // The "pay the deposit by bank transfer" option. Guests are shown these
+    // details after sending a request. Leave iban empty to hide the option.
+    'bank_transfer' => [
+        'holder' => '', // account holder, e.g. the company name
+        'iban' => '',
+        'bic' => '',
+        'bank' => '',
+    ],
+
+    // API key for Mistral's Zamboo (or any outside system) to read booking
+    // requests from /api/integration/v1/* — see INTEGRATION_API.md. Generate
+    // one with: php -r "echo bin2hex(random_bytes(32));"
+    // At least 32 characters; leave empty to keep the integration API off.
+    'integration' => [
+        'api_key' => '',
+    ],
+
     // Absolute filesystem path to public_html/images/uploads on THIS server —
     // varies per account/environment, so it's not hardcoded as a relative
     // path. On SiteGround this is typically something like

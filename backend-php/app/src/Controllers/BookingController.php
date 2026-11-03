@@ -6,6 +6,7 @@ use App\Http\Request;
 use App\Http\Response;
 use App\Repositories\BookingRepository;
 use App\Repositories\RoomRepository;
+use App\Services\BankTransfer;
 use App\Services\MailService;
 use App\Services\PriceQuote;
 use App\Services\StripeService;
@@ -39,6 +40,12 @@ class BookingController
             return;
         }
 
+        $guests = self::occupancy($body, $room);
+        if ($guests === false) {
+            Response::error(self::occupancyError($room));
+            return;
+        }
+
         $bookingRoomName = $roomName ?: ($room['name']['en'] ?? '');
 
         // Snapshot of the quote at request time, so a later price change in the
@@ -46,13 +53,14 @@ class BookingController
         $quote = PriceQuote::calculate($checkIn, $checkOut, (float) $room['basePricePerNight']);
         $currency = $room['currency'] ?? 'EUR';
 
-        // Paying the deposit online is the guest's choice. A request without one is
-        // saved as is; one that comes with a deposit is only accepted if Stripe
-        // confirms it is held for the right amount.
+        // A deposit is required whenever a way to pay one is set up: by card (only
+        // accepted if Stripe confirms it is held for the right amount) or by bank
+        // transfer (staff mark it received later). With neither configured,
+        // requests are taken without one.
         $payment = [];
         $paymentIntentId = $body['paymentIntentId'] ?? null;
         if ($paymentIntentId) {
-            if (!StripeService::isEnabled()) {
+            if (!StripeService::cardOffered()) {
                 Response::error('Online payment is not available.', 503);
                 return;
             }
@@ -81,10 +89,24 @@ class BookingController
                 'depositAmount' => $deposit,
                 'paymentStatus' => 'authorized',
             ];
+        } elseif (($body['paymentMethod'] ?? null) === 'bank_transfer') {
+            // Nothing to verify yet: the guest transfers the deposit after this,
+            // and staff mark it received in the admin.
+            if (!BankTransfer::isEnabled()) {
+                Response::error('Bank transfer is not available.', 503);
+                return;
+            }
+            $payment = [
+                'depositAmount' => PriceQuote::deposit($quote['totalPrice']),
+                'paymentStatus' => BankTransfer::AWAITING,
+            ];
+        } elseif (StripeService::cardOffered() || BankTransfer::isEnabled()) {
+            Response::error('Please choose how to pay the deposit.', 402);
+            return;
         }
 
         $this->saveAndRespond(
-            ['roomId' => $roomId, 'roomName' => $bookingRoomName, 'checkIn' => $checkIn, 'checkOut' => $checkOut, 'name' => $name, 'email' => $email, 'phone' => $phone],
+            ['roomId' => $roomId, 'roomName' => $bookingRoomName, 'checkIn' => $checkIn, 'checkOut' => $checkOut, 'name' => $name, 'email' => $email, 'phone' => $phone] + ($guests ?? []),
             $room,
             $quote + $payment + ['currency' => $currency]
         );
@@ -97,7 +119,7 @@ class BookingController
     // right deposit is held.
     public function complete(Request $request): void
     {
-        if (!StripeService::isEnabled()) {
+        if (!StripeService::cardOffered()) {
             Response::error('Online payment is not available.', 503);
             return;
         }
@@ -146,11 +168,51 @@ class BookingController
             return;
         }
 
+        // Checked when the session was created; the deposit is already held, so
+        // counts that no longer fit (the room's capacity changed meanwhile) are
+        // dropped rather than refusing the booking.
+        $guests = self::occupancy($meta, $room) ?: [];
+
         $this->saveAndRespond(
-            ['roomId' => $meta['roomId'], 'roomName' => $roomName ?: ($room['name']['en'] ?? ''), 'checkIn' => $meta['checkIn'], 'checkOut' => $meta['checkOut'], 'name' => $meta['name'], 'email' => $meta['email'], 'phone' => $meta['phone'] ?? null],
+            ['roomId' => $meta['roomId'], 'roomName' => $roomName ?: ($room['name']['en'] ?? ''), 'checkIn' => $meta['checkIn'], 'checkOut' => $meta['checkOut'], 'name' => $meta['name'], 'email' => $meta['email'], 'phone' => $meta['phone'] ?? null] + $guests,
             $room,
             $quote + ['currency' => $currency, 'paymentIntentId' => $intentId, 'depositAmount' => $deposit, 'paymentStatus' => $paymentStatus]
         );
+    }
+
+    // Babies (0–3) sleep in a cot, so they don't count against the room's
+    // capacity — but a room takes at most this many. Matches MAX_BABIES in the
+    // booking widget (Frontend/src/sections/booking.js).
+    public const MAX_BABIES = 2;
+
+    // Who the request is for, as ['adults', 'children', 'babies']: adults 18+,
+    // children 4–17, babies 0–3. At least one adult, and adults plus children
+    // fit the room's capacity. Null when no counts were sent (a page loaded
+    // before the field existed — the request is still taken); false when they
+    // were sent but don't fit.
+    public static function occupancy(array $input, array $room): array|false|null
+    {
+        if (($input['adults'] ?? '') === '') return null;
+
+        $counts = [];
+        foreach (['adults', 'children', 'babies'] as $key) {
+            $counts[$key] = filter_var($input[$key] ?? 0, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+            if ($counts[$key] === false) return false;
+        }
+        if ($counts['adults'] < 1 || $counts['babies'] > self::MAX_BABIES) return false;
+        if ($counts['adults'] + $counts['children'] > self::capacity($room)) return false;
+        return $counts;
+    }
+
+    public static function occupancyError(array $room): string
+    {
+        return 'This room sleeps up to ' . self::capacity($room) . ' adults and children, with at least one adult'
+            . ' (plus up to ' . self::MAX_BABIES . ' babies under 4).';
+    }
+
+    private static function capacity(array $room): int
+    {
+        return max(1, (int) ($room['capacity'] ?? 1));
     }
 
     private static function thanks(string $name, string $roomName): string
@@ -174,9 +236,13 @@ class BookingController
         // language they were browsing in.
         MailService::sendGuestBookingConfirmation($created);
 
-        Response::json([
+        $response = [
             'success' => true,
             'message' => self::thanks($input['name'], $input['roomName']),
-        ], 201);
+        ];
+        if ($created['paymentStatus'] === BankTransfer::AWAITING) {
+            $response['bankTransfer'] = BankTransfer::instructions($created);
+        }
+        Response::json($response, 201);
     }
 }

@@ -72,6 +72,7 @@ function wireRoomSelect() {
 
   toggle.addEventListener("click", (e) => {
     e.stopPropagation();
+    setGuestMenuOpen(false);
     wrap.classList.toggle("open");
   });
 
@@ -91,6 +92,71 @@ function wireRoomSelect() {
   }
 }
 
+// Babies (0–3) sleep in a cot, so they don't count against the room's
+// capacity — but a room takes at most this many. Matches
+// BookingController::MAX_BABIES on the server.
+const MAX_BABIES = 2;
+
+const GUEST_KINDS = [
+  { key: "adults", title: "booking.adultsTitle", age: "booking.adultsAge", one: "booking.adult", many: "booking.adults" },
+  { key: "children", title: "booking.childrenTitle", age: "booking.childrenAge", one: "booking.child", many: "booking.children" },
+  { key: "babies", title: "booking.babiesTitle", age: "booking.babiesAge", one: "booking.baby", many: "booking.babies" }
+];
+
+// "2 adults, 1 child" — children and babies only when there are any.
+function guestsText(guests) {
+  return GUEST_KINDS.filter(({ key }) => guests[key] > 0)
+    .map(({ key, one, many }) => `${guests[key]} ${t(guests[key] === 1 ? one : many)}`)
+    .join(", ");
+}
+
+// The guests panel. Each −/+ redraws the whole widget, so whether it's open is
+// kept here and re-applied on every render.
+let guestMenuOpen = false;
+let guestSelectOutsideClickWired = false;
+
+function setGuestMenuOpen(open) {
+  guestMenuOpen = open;
+  document.getElementById("guestSelect")?.classList.toggle("open", open);
+  document.getElementById("guestSelectToggle")?.setAttribute("aria-expanded", String(open));
+}
+
+function wireGuestSelect() {
+  const wrap = document.getElementById("guestSelect");
+  if (!wrap) return;
+
+  document.getElementById("guestSelectToggle").addEventListener("click", () => {
+    document.getElementById("roomSelect")?.classList.remove("open");
+    setGuestMenuOpen(!guestMenuOpen);
+  });
+  // Clicks inside stay inside: a −/+ click redraws the widget, and the document
+  // handler below would otherwise see a click on a detached button and close.
+  wrap.addEventListener("click", (e) => e.stopPropagation());
+  wrap.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !guestMenuOpen) return;
+    setGuestMenuOpen(false);
+    document.getElementById("guestSelectToggle").focus();
+  });
+
+  // Keep focus on the stepper (on the other button once this one is disabled
+  // at the limit).
+  wrap.querySelectorAll("[data-guest]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const { guest, step } = btn.dataset;
+      state.booking[guest] += Number(step);
+      renderBookingWidget();
+      const same = document.getElementById(btn.id);
+      const other = document.getElementById(`${guest}${step === "1" ? "Less" : "More"}`);
+      (same.disabled ? other : same).focus();
+    });
+  });
+
+  if (!guestSelectOutsideClickWired) {
+    document.addEventListener("click", () => guestMenuOpen && setGuestMenuOpen(false));
+    guestSelectOutsideClickWired = true;
+  }
+}
+
 // Back from Stripe's hosted payment page: finish the booking and say so.
 // The widget redraws its whole DOM (e.g. when the payment config arrives), so the
 // message is remembered and re-applied after every render.
@@ -106,6 +172,74 @@ function applyCheckoutStatus() {
     el.textContent = checkoutStatus.text;
     el.className = "form-status " + checkoutStatus.cls;
   }
+}
+
+// A bank-transfer request that was just sent: its stay, price and transfer
+// details stay in the "Your stay" card (the form itself is cleared) until the
+// guest starts choosing a new stay.
+let completedBooking = null;
+
+// "Your stay" — whatever is known so far: the room, the dates, the price, the
+// deposit and, after a bank-transfer request, where to send it. Null when
+// nothing is chosen yet, so the card isn't shown at all.
+function summaryCardHtml(s) {
+  if (!s.roomName && !s.nights) return null;
+  const night = (n) => t(n === 1 ? "booking.night" : "booking.nights");
+  let price = "";
+  if (s.roomName && s.nights) {
+    price = `<div class="summary-row">
+        <span>${s.nights} ${night(s.nights)} × €${s.perNight}</span>
+        <span>€${s.total}</span>
+      </div>
+      <div class="summary-row summary-total">
+        <span>${t("booking.total")}</span>
+        <strong>€${s.total}</strong>
+      </div>
+      ${
+        s.deposit
+          ? `<div class="summary-row summary-deposit">
+              <span>${t("booking.deposit")} ${s.depositPercent}%<small>${t(s.method === "card" ? "booking.payCard" : "booking.payBank")}</small></span>
+              <strong>€${s.deposit}</strong>
+            </div>`
+          : ""
+      }`;
+  } else if (s.roomName) {
+    price = `<div class="summary-row"><span>${t("booking.perNightLabel")}</span><span>€${s.perNight}</span></div>`;
+  } else {
+    price = `<div class="summary-row"><span>${s.nights} ${night(s.nights)}</span></div>`;
+  }
+  // One row per kind of guest that's been added: "Възрастни 18+ години … 2".
+  const guestRows = GUEST_KINDS.filter(({ key }) => s.guests?.[key] > 0)
+    .map(
+      ({ key, title, age }) => `<div class="summary-row summary-guest">
+        <span>${t(title)}<small>${t(age)}</small></span>
+        <span>${s.guests[key]}</span>
+      </div>`
+    )
+    .join("");
+  return `<aside class="booking-summary" aria-live="polite">
+      <h4>${t("booking.summaryTitle")}</h4>
+      ${s.roomName ? `<p class="summary-room">${escapeHtml(s.roomName)}</p>` : ""}
+      ${s.checkIn && s.checkOut ? `<p class="summary-dates">${escapeHtml(formatDateLabel(s.checkIn))} – ${escapeHtml(formatDateLabel(s.checkOut))}</p>` : ""}
+      ${guestRows}
+      ${price}
+      ${s.bankTransfer ? bankTransferHtml(s.bankTransfer) : ""}
+    </aside>`;
+}
+
+// Where and how to transfer the deposit — the same details are emailed too.
+function bankTransferHtml(bt) {
+  const amount = bt.currency === "EUR" ? `€${bt.amount}` : `${bt.amount} ${bt.currency}`;
+  const row = (label, value) => `<div class="bank-row"><span>${label}</span><strong>${escapeHtml(value)}</strong></div>`;
+  return `<div class="bank-details">
+      <h5>${t("booking.bankTitle")}</h5>
+      ${row(t("booking.bankHolder"), bt.holder)}
+      ${row("IBAN", bt.iban)}
+      ${bt.bic ? row("BIC", bt.bic) : ""}
+      ${row(t("booking.bankAmount"), amount)}
+      ${row(t("booking.bankReference"), bt.reference)}
+      <p>${t("booking.bankNote")}</p>
+    </div>`;
 }
 function handleCheckoutReturn() {
   applyCheckoutStatus();
@@ -125,6 +259,7 @@ function detailsMissing() {
   const field = (id) => document.getElementById(id);
   if (!b.checkIn || !b.checkOut) return { message: "booking.selectDatesError" };
   if (!b.roomId) return { message: "booking.selectRoomError", focus: "roomSelectToggle" };
+  if (!b.adults) return { message: "booking.guestsError", focus: "guestSelectToggle" };
   if (!field("bookingName")?.value.trim()) return { message: "booking.nameError", focus: "bookingName" };
   const email = field("bookingEmail");
   if (!email?.value.trim() || !email.checkValidity()) return { message: "booking.emailError", focus: "bookingEmail" };
@@ -196,45 +331,77 @@ export function renderBookingWidget() {
     ? `${escapeHtml(pickLocalized(selectedRoom.name, state.lang))} — €${selectedRoom.basePricePerNight}${t("rooms.perNight")}`
     : t("booking.selectRoom");
 
+  // Who's coming: everything starts at 0 and the guest adds people. Adults
+  // plus children fit what the chosen room sleeps (before a room is chosen,
+  // the largest room); babies don't count against that. Choosing a smaller
+  // room brings the counts down. At least one adult is required to send
+  // (detailsMissing / the submit handler), not enforced by the counter.
+  const b = state.booking;
+  const capacities = selectedRoom ? [selectedRoom.capacity] : state.rooms.map((r) => r.capacity);
+  const maxGuests = capacities.length ? Math.max(1, ...capacities) : b.adults + b.children;
+  b.adults = Math.min(Math.max(0, b.adults || 0), maxGuests);
+  b.children = Math.min(Math.max(0, b.children || 0), maxGuests - b.adults);
+  b.babies = Math.min(Math.max(0, b.babies || 0), MAX_BABIES);
+  const guests = { adults: b.adults, children: b.children, babies: b.babies };
+  const noGuests = !b.adults && !b.children && !b.babies;
+  const guestLimits = {
+    adults: [0, maxGuests - b.children],
+    children: [0, maxGuests - b.adults],
+    babies: [0, MAX_BABIES]
+  };
+
   // Preview only — the server recomputes the real quote from the room's stored price.
-  // Paying online is the guest's choice: the card only appears once they tick it.
+  // Paying a deposit is the guest's choice, by card ("Онлайн") or by bank
+  // transfer — at most one of the two boxes is ticked (state.booking.payMethod).
   const payment = getPaymentConfig();
-  const paymentOn = !!payment?.enabled;
-  const payOnline = paymentOn && !!state.booking.payOnline;
+  const cardOn = !!payment?.enabled;
+  const bankOn = !!payment?.bankTransfer;
+  const payOnline = cardOn && state.booking.payMethod === "card";
+  const payBank = bankOn && state.booking.payMethod === "bank";
   const nights = nightsBetween(checkIn, checkOut);
   const total = selectedRoom ? Math.round(nights * selectedRoom.basePricePerNight * 100) / 100 : 0;
-  const deposit = payOnline ? Math.round(total * payment.depositPercent) / 100 : 0;
-  const priceSummary =
-    selectedRoom && nights > 0
-      ? `<div class="booking-price">
-          <div class="booking-price-row">
-            <span>${nights} ${t(nights === 1 ? "booking.night" : "booking.nights")} × €${selectedRoom.basePricePerNight}</span>
-            <strong>${t("booking.total")}: €${total}</strong>
-          </div>
-          ${
-            payOnline
-              ? `<div class="booking-price-row deposit">
-                  <span>${t("booking.deposit")} ${payment.depositPercent}%</span>
-                  <strong>€${deposit}</strong>
-                </div>`
-              : ""
-          }
-        </div>`
-      : "";
+  const deposit = payOnline || payBank ? Math.round(total * payment.depositPercent) / 100 : 0;
+  // The stay and what it costs, in its own card beside the reservation form —
+  // only once something is chosen. Choosing a new stay replaces the card of a
+  // bank-transfer request that was just sent.
+  const currentStay = {
+    roomName: selectedRoom ? pickLocalized(selectedRoom.name, state.lang) : "",
+    perNight: selectedRoom?.basePricePerNight,
+    checkIn,
+    checkOut,
+    guests,
+    nights,
+    total,
+    deposit,
+    depositPercent: payment?.depositPercent,
+    method: payOnline ? "card" : "bank"
+  };
+  if (currentStay.roomName || nights > 0) completedBooking = null;
+  const summaryCard = summaryCardHtml(completedBooking || currentStay);
   // With "pay online" ticked the reservation card has two sides: the booking
   // details on the front and, once they're all filled in, the bank card on the
   // back — the card spins over to it (see flipBookingCard).
   const onBack = payOnline && state.booking.payStep === "card";
-  const payToggle = paymentOn
-    ? `<div class="pay-online">
+  const payOption = (id, checked, icon, label) => `
         <label class="pay-online-toggle">
-          <input type="checkbox" id="payOnline" ${payOnline ? "checked" : ""} />
-          <svg class="pay-online-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></svg>
-          <span>${t("booking.payOnline").replace("{pct}", payment.depositPercent)}</span>
-        </label>
+          <input type="checkbox" id="${id}" ${checked ? "checked" : ""} />
+          <svg class="pay-online-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon}</svg>
+          <span>${label}</span>
+        </label>`;
+  const CARD_ICON = `<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/>`;
+  const BANK_ICON = `<path d="M3 9.5 12 4l9 5.5M4.5 20h15M6 10.5v7M10 10.5v7M14 10.5v7M18 10.5v7"/>`;
+  const payToggle =
+    cardOn || bankOn
+      ? `<div class="pay-online">
+        <p class="pay-online-title">${t("booking.payChoose").replace("{pct}", payment.depositPercent)}</p>
+        <div class="pay-online-options">
+          ${cardOn ? payOption("payOnline", payOnline, CARD_ICON, t("booking.payCard")) : ""}
+          ${bankOn ? payOption("payBank", payBank, BANK_ICON, t("booking.payBank")) : ""}
+        </div>
         ${payOnline ? `<p class="pay-online-hint">${t("booking.payFillFirst")}</p>` : ""}
+        ${payBank ? `<p class="pay-online-hint">${t("booking.bankHint")}</p>` : ""}
       </div>`
-    : "";
+      : "";
   const submitButton = `<button class="btn btn-gold" type="submit">
         <span class="material-symbols-outlined">event_available</span> ${t("booking.submit")}
       </button>`;
@@ -248,7 +415,7 @@ export function renderBookingWidget() {
         <button type="button" class="booking-face-back" id="bookingEditDetails">
           <span class="material-symbols-outlined">chevron_left</span> ${t("booking.editDetails")}
         </button>
-        <p class="booking-face-summary">${selectedRoom ? escapeHtml(pickLocalized(selectedRoom.name, state.lang)) : ""}${checkIn && checkOut ? ` · ${escapeHtml(formatDateLabel(checkIn))} – ${escapeHtml(formatDateLabel(checkOut))}` : ""}</p>
+        <p class="booking-face-summary">${selectedRoom ? escapeHtml(pickLocalized(selectedRoom.name, state.lang)) : ""}${checkIn && checkOut ? ` · ${escapeHtml(formatDateLabel(checkIn))} – ${escapeHtml(formatDateLabel(checkOut))}` : ""} · ${escapeHtml(guestsText(guests))}</p>
         <div class="field">
           <label>${t("booking.card")}</label>
           ${onBack ? renderPayCard() : ""}
@@ -256,7 +423,6 @@ export function renderBookingWidget() {
           <button type="button" class="pay-fallback" id="payViaStripe" hidden>${t("booking.payOnStripe")}</button>
           <p class="card-note">${t("booking.depositNote").replace("{pct}", payment.depositPercent)}</p>
         </div>
-        ${priceSummary}
         ${submitButton}
       </div>`
     : "";
@@ -265,7 +431,7 @@ export function renderBookingWidget() {
   const typed = ["bookingName", "bookingEmail", "bookingPhone"].map((id) => [id, document.getElementById(id)?.value || ""]);
 
   root.innerHTML = `
-    <div class="booking-widget-row">
+    <div class="booking-widget-row${summaryCard ? " with-summary" : ""}">
     <div class="booking-card">
       <div class="date-fields">
         <div class="date-field">
@@ -333,10 +499,40 @@ export function renderBookingWidget() {
             ${state.rooms
               .map(
                 (r) =>
-                  `<li role="option" data-room-id="${r.id}" class="${r.id === roomId ? "active" : ""}">${escapeHtml(pickLocalized(r.name, state.lang))} — €${r.basePricePerNight}${t("rooms.perNight")}</li>`
+                  `<li role="option" data-room-id="${r.id}" class="${r.id === roomId ? "active" : ""}">
+                    <span>${escapeHtml(pickLocalized(r.name, state.lang))} — €${r.basePricePerNight}${t("rooms.perNight")}</span>
+                    <span class="room-option-capacity" title="${r.capacity} ${t("rooms.guests")}"><span class="material-symbols-outlined">group</span>${r.capacity}</span>
+                  </li>`
               )
               .join("")}
           </ul>
+        </div>
+      </div>
+      <div class="field">
+        <label id="bookingGuestsLabel">${t("booking.guests")}</label>
+        <div class="room-select guest-select${guestMenuOpen ? " open" : ""}" id="guestSelect">
+          <button type="button" class="room-select-toggle" id="guestSelectToggle" aria-expanded="${guestMenuOpen}" aria-controls="guestSelectMenu" aria-labelledby="bookingGuestsLabel guestSelectValue">
+            <span class="guest-select-value${noGuests ? " placeholder" : ""}" id="guestSelectValue"><span class="material-symbols-outlined">group</span>${noGuests ? t("booking.selectGuests") : escapeHtml(guestsText(guests))}</span>
+            <span class="material-symbols-outlined caret">expand_more</span>
+          </button>
+          <div class="room-select-menu guest-select-menu" id="guestSelectMenu">
+            ${GUEST_KINDS.map(({ key, title, age }) => {
+              const [min, max] = guestLimits[key];
+              return `<div class="guest-row" role="group" aria-label="${t(title)}">
+                <div class="guest-row-label"><strong>${t(title)}</strong><small>${t(age)}</small></div>
+                <div class="guest-stepper">
+                  <button type="button" id="${key}Less" data-guest="${key}" data-step="-1" aria-label="${t(title)}: ${t("booking.guestsLess")}" ${guests[key] <= min ? "disabled" : ""}>
+                    <span class="material-symbols-outlined">remove</span>
+                  </button>
+                  <output aria-live="polite">${guests[key]}</output>
+                  <button type="button" id="${key}More" data-guest="${key}" data-step="1" aria-label="${t(title)}: ${t("booking.guestsMore")}" ${guests[key] >= max ? "disabled" : ""}>
+                    <span class="material-symbols-outlined">add</span>
+                  </button>
+                </div>
+              </div>`;
+            }).join("")}
+            ${selectedRoom ? `<p class="guest-select-note">${t("booking.guestsNote").replace("{n}", maxGuests).replace("{b}", MAX_BABIES)}</p>` : ""}
+          </div>
         </div>
       </div>
       <div class="field">
@@ -354,12 +550,12 @@ export function renderBookingWidget() {
         </div>
       </div>
       ${payToggle}
-      ${priceSummary}
       ${frontButton}
       </div>
       ${backFace}
       <div class="form-status" id="bookingStatus"></div>
     </form>
+    ${summaryCard || ""}
     </div>
   `;
 
@@ -396,16 +592,20 @@ export function renderBookingWidget() {
   for (const [id, value] of typed) document.getElementById(id).value = value;
 
   wireRoomSelect();
+  wireGuestSelect();
 
   syncFallbackButton();
   document.getElementById("payViaStripe")?.addEventListener("click", () => document.getElementById("bookingForm").requestSubmit());
-  document.getElementById("payOnline")?.addEventListener("change", (e) => {
-    state.booking.payOnline = e.target.checked;
-    state.booking.payStep = "details";
-    state.booking.editingDetails = false; // already complete? then it spins right away
-    renderBookingWidget();
-    document.getElementById("payOnline")?.focus();
-  });
+  // Ticking one payment box unticks the other; unticking leaves no deposit.
+  for (const [id, method] of [["payOnline", "card"], ["payBank", "bank"]]) {
+    document.getElementById(id)?.addEventListener("change", (e) => {
+      state.booking.payMethod = e.target.checked ? method : null;
+      state.booking.payStep = "details";
+      state.booking.editingDetails = false; // card + details already complete? then it spins right away
+      renderBookingWidget();
+      document.getElementById(id)?.focus();
+    });
+  }
   document.getElementById("bookingContinue")?.addEventListener("click", () => continueToCard());
   document.getElementById("bookingEditDetails")?.addEventListener("click", () => {
     state.booking.editingDetails = true; // don't spin straight back on the next redraw
@@ -421,7 +621,7 @@ export function renderBookingWidget() {
   handleCheckoutReturn();
 
   // Payment config loads once; the first time it says "on", re-render so the checkbox appears.
-  if (payment === null) loadPayment().then((c) => c.enabled && renderBookingWidget());
+  if (payment === null) loadPayment().then((c) => (c.enabled || c.bankTransfer) && renderBookingWidget());
   else if (onBack) {
     if (!flipping) mountCardWhenVisible(); // mid-spin, it's mounted once the card faces forward
   } else unmountCard();
@@ -446,8 +646,25 @@ export function renderBookingWidget() {
       status.className = "form-status error";
       return;
     }
+    if (!b.adults) {
+      status.textContent = t("booking.guestsError");
+      status.className = "form-status error";
+      setGuestMenuOpen(true);
+      document.getElementById("adultsMore")?.focus();
+      return;
+    }
 
-    const payNow = !!getPaymentConfig()?.enabled && !!b.payOnline;
+    const config = getPaymentConfig();
+    const payNow = !!config?.enabled && b.payMethod === "card";
+    const payByTransfer = !!config?.bankTransfer && b.payMethod === "bank";
+    // A deposit is required whenever a way to pay one is offered.
+    if ((config?.enabled || config?.bankTransfer) && !payNow && !payByTransfer) {
+      status.textContent = t("booking.payRequired");
+      status.className = "form-status error";
+      document.querySelector(".pay-online")?.classList.add("is-missing");
+      document.querySelector(".pay-online input")?.focus();
+      return;
+    }
     if (payNow && b.payStep !== "card") return continueToCard(); // Enter on the details side
     const useCheckout = payNow && isCardFailed();
     if (payNow && !useCheckout && !getCardHolder()) {
@@ -457,12 +674,14 @@ export function renderBookingWidget() {
       return;
     }
 
+    checkoutStatus = null; // a new request replaces the last one's message
     status.textContent = t("booking.sending");
     status.className = "form-status";
 
     const form = e.target;
     const payload = Object.fromEntries(new FormData(form).entries());
     payload.roomId = b.roomId;
+    Object.assign(payload, { adults: b.adults, children: b.children, babies: b.babies });
     const room = state.rooms.find((r) => r.id === b.roomId);
     const submitBtn = form.querySelector("button[type=submit]");
     submitBtn.disabled = true; // a double-click would place two holds on the card
@@ -477,7 +696,10 @@ export function renderBookingWidget() {
           checkOut: formatDate(b.checkOut),
           name: payload.name,
           email: payload.email,
-          phone: payload.phone
+          phone: payload.phone,
+          adults: b.adults,
+          children: b.children,
+          babies: b.babies
         });
         return; // the browser is navigating to Stripe
       }
@@ -490,6 +712,7 @@ export function renderBookingWidget() {
           email: payload.email
         });
       }
+      if (payByTransfer) payload.paymentMethod = "bank_transfer";
 
       const res = await fetch(`${API_BASE}/bookings`, {
         method: "POST",
@@ -506,10 +729,27 @@ export function renderBookingWidget() {
       status.textContent = data.message;
       status.className = "form-status success";
       form.reset();
-      state.booking = { checkIn: null, checkOut: null, roomId: "", calendarMonth: startOfMonth(new Date()) };
-      renderBookingWidget();
-      document.getElementById("bookingStatus").textContent = data.message;
-      document.getElementById("bookingStatus").className = "form-status success";
+      state.booking = { checkIn: null, checkOut: null, roomId: "", adults: 0, children: 0, babies: 0, calendarMonth: startOfMonth(new Date()) };
+      checkoutStatus = { text: data.message, cls: "success" };
+      // Booked by bank transfer: the stay and where to send the deposit stay in
+      // the "Your stay" card. (`b` is still the request's own booking state.)
+      if (data.bankTransfer && room) {
+        const nights = nightsBetween(b.checkIn, b.checkOut);
+        completedBooking = {
+          roomName: pickLocalized(room.name, state.lang),
+          perNight: room.basePricePerNight,
+          checkIn: b.checkIn,
+          checkOut: b.checkOut,
+          guests: { adults: b.adults, children: b.children, babies: b.babies },
+          nights,
+          total: Math.round(nights * room.basePricePerNight * 100) / 100,
+          deposit: data.bankTransfer.amount,
+          depositPercent: getPaymentConfig()?.depositPercent,
+          method: "bank",
+          bankTransfer: data.bankTransfer
+        };
+      }
+      renderBookingWidget(); // shows checkoutStatus and the card
     } catch (err) {
       status.textContent = err.expose ? err.message : t("contact.errorGeneric");
       status.className = "form-status error";

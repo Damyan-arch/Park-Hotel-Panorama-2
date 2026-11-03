@@ -54,6 +54,9 @@ CREATE TABLE booking_requests (
   name varchar NOT NULL,
   email varchar NOT NULL,
   phone varchar,
+  adults smallint,
+  children smallint,
+  babies smallint,
   nights integer,
   price_per_night numeric(10,2),
   total_price numeric(10,2),
@@ -62,8 +65,11 @@ CREATE TABLE booking_requests (
   deposit_amount numeric(10,2),
   payment_status varchar,
   status varchar NOT NULL DEFAULT 'new',
-  received_at timestamptz NOT NULL DEFAULT now()
+  received_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz(0) NOT NULL DEFAULT now()
 );
+
+CREATE INDEX booking_requests_updated_at ON booking_requests (updated_at, id);
 
 CREATE TABLE contact_inquiries (
   id SERIAL PRIMARY KEY,

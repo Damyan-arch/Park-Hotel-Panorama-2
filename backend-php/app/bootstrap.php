@@ -61,9 +61,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 
 App\Db\Database::init($config['db']);
 App\Auth\AdminAuth::init($config['admin']);
+App\Auth\IntegrationAuth::init($config['integration'] ?? []);
 App\Services\TranslateService::init($config['deepl_api_key'] ?? '');
 App\Services\MailService::init($config['mail'] ?? []);
 App\Services\StripeService::init($config['stripe'] ?? []);
+App\Services\BankTransfer::init($config['bank_transfer'] ?? []);
 
 define('UPLOADS_DIR', rtrim($config['uploads_dir'] ?? '', '/'));
 

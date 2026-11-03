@@ -48,7 +48,7 @@ export const state = {
   rooms: [],
   gallery: [],
   events: [],
-  booking: { checkIn: null, checkOut: null, roomId: "", calendarMonth: startOfMonth(new Date()) }
+  booking: { checkIn: null, checkOut: null, roomId: "", adults: 0, children: 0, babies: 0, calendarMonth: startOfMonth(new Date()) }
 };
 
 // Event dates are plain YYYY-MM-DD calendar days. `new Date("2026-10-02")`

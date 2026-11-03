@@ -66,6 +66,20 @@ class BookingRepositoryTest extends TestCase
         $this->assertEquals('EUR', $created['currency']);
     }
 
+    public function testGuestsRoundTrip(): void
+    {
+        $repo = new BookingRepository();
+
+        $created = $repo->create($this->sampleBooking(['adults' => 2, 'children' => 1, 'babies' => 0]));
+        $this->assertSame(2, $created['adults']);
+        $this->assertSame(1, $created['children']);
+        $this->assertSame(0, $created['babies']);
+
+        $old = $repo->create($this->sampleBooking());
+        $this->assertNull($old['adults']);
+        $this->assertNull($old['babies']);
+    }
+
     public function testBookingWithoutQuoteHasNullPrice(): void
     {
         $created = (new BookingRepository())->create($this->sampleBooking());
@@ -103,6 +117,50 @@ class BookingRepositoryTest extends TestCase
 
         $updated = $repo->updateStatus($created['id'], 'confirmed');
         $this->assertEquals('confirmed', $updated['status']);
+    }
+
+    public function testStatusAndPaymentUpdatesBumpUpdatedAt(): void
+    {
+        $repo = new BookingRepository();
+        $created = $repo->create($this->sampleBooking(['paymentStatus' => 'authorized']));
+        Database::pdo()->exec("UPDATE booking_requests SET updated_at = '2026-01-01 00:00:00'");
+
+        $repo->updateStatus($created['id'], 'contacted');
+        $this->assertTrue(strtotime($repo->find($created['id'])['updatedAt']) > strtotime('2026-01-02'));
+
+        Database::pdo()->exec("UPDATE booking_requests SET updated_at = '2026-01-01 00:00:00'");
+        $repo->updatePaymentStatus($created['id'], 'captured');
+        $this->assertTrue(strtotime($repo->find($created['id'])['updatedAt']) > strtotime('2026-01-02'));
+    }
+
+    public function testChangedSinceUsesUpdatedAtAndIdAsCursor(): void
+    {
+        $repo = new BookingRepository();
+        $a = $repo->create($this->sampleBooking(['name' => 'A']));
+        $b = $repo->create($this->sampleBooking(['name' => 'B']));
+        $c = $repo->create($this->sampleBooking(['name' => 'C']));
+        $pdo = Database::pdo();
+        // A and C share a second; B is later — order is (updated_at, id).
+        $pdo->exec("UPDATE booking_requests SET updated_at = '2026-05-01 10:00:00' WHERE id IN ({$a['id']}, {$c['id']})");
+        $pdo->exec("UPDATE booking_requests SET updated_at = '2026-05-01 11:00:00' WHERE id = {$b['id']}");
+
+        $all = $repo->changedSince(null, 0, '2026-06-01 00:00:00', 10);
+        $this->assertEquals([$a['id'], $c['id'], $b['id']], array_column($all, 'id'));
+
+        $afterA = $repo->changedSince('2026-05-01 10:00:00', $a['id'], '2026-06-01 00:00:00', 10);
+        $this->assertEquals([$c['id'], $b['id']], array_column($afterA, 'id'));
+
+        $this->assertCount(1, $repo->changedSince(null, 0, '2026-06-01 00:00:00', 1));
+    }
+
+    public function testChangedSinceExcludesTheCurrentSecond(): void
+    {
+        $repo = new BookingRepository();
+        $repo->create($this->sampleBooking());
+        Database::pdo()->exec("UPDATE booking_requests SET updated_at = '2026-05-01 10:00:00'");
+
+        $this->assertCount(0, $repo->changedSince(null, 0, '2026-05-01 10:00:00', 10));
+        $this->assertCount(1, $repo->changedSince(null, 0, '2026-05-01 10:00:01', 10));
     }
 
     public function testUpdateStatusReturnsNullForUnknownId(): void

@@ -1330,6 +1330,122 @@ nav.main-nav a:hover::after {
   background: rgba(201, 162, 75, 0.2);
 }
 
+.room-select-menu li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* How many people the room sleeps, at the end of each option. */
+.room-option-capacity {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  color: var(--ink-400);
+}
+
+.room-option-capacity .material-symbols-outlined {
+  font-size: 17px;
+}
+
+/* Guests: a dropdown like the room picker, with a −/+ counter per age group. */
+.guest-select-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guest-select-value .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--gold-500);
+}
+
+.guest-select-menu {
+  padding: 4px 16px 12px;
+}
+
+.guest-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.guest-row + .guest-row {
+  border-top: 1px dashed var(--line);
+}
+
+.guest-row-label strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--ink-900);
+}
+
+.guest-row-label small {
+  font-size: 0.8rem;
+  color: var(--ink-400);
+}
+
+.guest-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.guest-stepper button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--gold-500);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.guest-stepper button:hover:not(:disabled) {
+  border-color: var(--gold-500);
+  background: rgba(201, 162, 75, 0.1);
+}
+
+.guest-stepper button:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 1px;
+}
+
+.guest-stepper button:disabled {
+  color: var(--ink-400);
+  opacity: 0.4;
+  cursor: default;
+}
+
+.guest-stepper .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.guest-stepper output {
+  min-width: 24px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--pine-900);
+}
+
+.guest-select-note {
+  margin: 4px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ink-400);
+}
+
 .contact-form .field {
   margin-bottom: 16px;
 }
@@ -1344,24 +1460,6 @@ nav.main-nav a:hover::after {
   width: 100%;
   justify-content: center;
   margin-top: 6px;
-}
-
-.booking-price-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.booking-price-row.deposit {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed var(--line);
-}
-
-.booking-price-row.deposit strong {
-  font-size: 1rem;
 }
 
 /* Two-sided card entry form, matching a card design from Uiverse.io (by
@@ -1643,8 +1741,33 @@ nav.main-nav a:hover::after {
   margin-top: 0;
 }
 
+.pay-online-title {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--pine-900);
+}
+
+/* Sent without choosing how to pay the (required) deposit. Cleared by the
+   next redraw, e.g. ticking one of the boxes. */
+.pay-online.is-missing .pay-online-title {
+  color: #b3392c;
+}
+
+.contact-form .pay-online.is-missing .pay-online-toggle input {
+  outline: 2px solid #b3392c;
+  outline-offset: 2px;
+}
+
+/* "Онлайн" and "Банков превод" side by side */
+.pay-online-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+}
+
 .pay-online-hint {
-  margin: 8px 0 0 28px;
+  margin: 8px 0 0;
   font-size: 0.8rem;
   line-height: 1.45;
   color: var(--ink-400);
@@ -1687,10 +1810,6 @@ nav.main-nav a:hover::after {
   color: var(--ink-400);
 }
 
-.booking-face--back .booking-price {
-  margin-top: 4px;
-}
-
 .pay-online-icon {
   display: block;
   width: 20px;
@@ -1706,21 +1825,99 @@ nav.main-nav a:hover::after {
   color: var(--ink-400);
 }
 
-.booking-price {
-  margin: 18px 0 16px;
-  padding: 14px 18px;
+/* "Your stay": the room, dates, price and deposit, in a card beside the form */
+.booking-summary {
+  background: var(--cream-050);
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--cream-100);
-  color: var(--ink-600);
-  font-size: 0.92rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
 }
 
-.booking-price strong {
-  color: var(--pine-800);
+.booking-summary h4 {
+  margin: 0 0 16px;
   font-family: var(--font-display);
   font-size: 1.2rem;
+  color: var(--pine-900);
 }
+
+.summary-room {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.summary-dates {
+  margin: 4px 0 16px;
+  font-size: 0.85rem;
+  color: var(--ink-400);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px dashed var(--line);
+  font-size: 0.9rem;
+  color: var(--ink-600);
+}
+
+.summary-total span {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.summary-total strong {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--pine-800);
+}
+
+.summary-deposit {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: rgba(201, 162, 75, 0.12);
+}
+
+/* The guests, one kind per row, kept together as one block. */
+.summary-guest {
+  padding: 8px 0;
+}
+
+.summary-guest + .summary-guest {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.summary-guest small {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  color: var(--ink-400);
+}
+
+.summary-guest span:last-child {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.summary-deposit small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--ink-400);
+}
+
+.summary-deposit strong {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--pine-800);
+}
+
 
 .form-status {
   margin-top: 14px;
@@ -1731,6 +1928,46 @@ nav.main-nav a:hover::after {
 
 .form-status.success { color: var(--pine-700); }
 .form-status.error { color: #b3392c; }
+
+/* IBAN etc. after a bank-transfer request */
+.bank-details {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--cream-100);
+  color: var(--ink-600);
+  font-weight: 500;
+}
+
+.bank-details h5 {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: var(--ink-900);
+}
+
+.bank-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 0.86rem;
+}
+
+.bank-row strong {
+  color: var(--ink-900);
+  text-align: right;
+  overflow-wrap: anywhere;
+  user-select: all; /* one click selects the whole IBAN for copying */
+}
+
+.bank-details p {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ink-400);
+}
 
 @media (max-width: 860px) {
   .contact-form .form-row { grid-template-columns: 1fr; }
@@ -1978,6 +2215,30 @@ footer.site-footer {
   align-items: start;
 }
 
+/* Narrower than three columns: "your stay" goes under the form. */
+.booking-summary {
+  grid-column: 2;
+}
+
+/* Wide screens, once "your stay" has something to show: calendar | form |
+   "your stay", side by side. The calendar and form keep their usual width, so
+   the row breaks out of the page container and is centred with left/margin —
+   not a transform, which would sit around Stripe's card iframes. */
+@media (min-width: 1200px) {
+  .booking-widget-row.with-summary {
+    --row-width: min(1560px, calc(100vw - 80px));
+    position: relative;
+    left: 50%;
+    width: var(--row-width);
+    margin-left: calc(var(--row-width) / -2);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.62fr);
+  }
+
+  .booking-summary {
+    grid-column: auto;
+  }
+}
+
 .booking-intro {
   display: flex;
   flex-direction: column;
@@ -2186,6 +2447,10 @@ footer.site-footer {
 @media (max-width: 560px) {
   .booking-widget-row {
     grid-template-columns: 1fr;
+  }
+
+  .booking-summary {
+    grid-column: auto;
   }
 }
 

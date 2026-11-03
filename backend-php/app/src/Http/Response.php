@@ -6,7 +6,9 @@ class Response
 {
     public static function json($data, int $status = 200): void
     {
-        http_response_code($status);
+        // Skipped once output has started — only ever under the test runner,
+        // where PHP 8.3 warns instead, and that warning text corrupts the JSON.
+        if (!headers_sent()) http_response_code($status);
         // The CLI SAPI (only ever used by the test suite and database/*.php
         // scripts, never the real deployed app) has no real headers to send —
         // calling header() there errors the moment anything has echoed

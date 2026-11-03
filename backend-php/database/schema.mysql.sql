@@ -58,6 +58,9 @@ CREATE TABLE booking_requests (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(255),
+  adults SMALLINT UNSIGNED,
+  children SMALLINT UNSIGNED,
+  babies SMALLINT UNSIGNED,
   nights INT UNSIGNED,
   price_per_night NUMERIC(10,2),
   total_price NUMERIC(10,2),
@@ -67,7 +70,9 @@ CREATE TABLE booking_requests (
   payment_status VARCHAR(32),
   status VARCHAR(255) NOT NULL DEFAULT 'new',
   received_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL,
+  INDEX booking_requests_updated_at (updated_at, id)
 );
 
 CREATE TABLE contact_inquiries (

@@ -3,12 +3,13 @@
 namespace App\Http;
 
 use App\Auth\AdminAuth;
+use App\Auth\IntegrationAuth;
 
 class Router
 {
     private array $routes = [];
 
-    // $routes: array of [method, pattern, [ControllerClass, 'method'], ?'admin']
+    // $routes: array of [method, pattern, [ControllerClass, 'method'], ?'admin'|'integration']
     // pattern uses {name} placeholders, e.g. '/rooms/{id}'.
     public function __construct(array $routes)
     {
@@ -19,7 +20,7 @@ class Router
     {
         foreach ($this->routes as $route) {
             [$method, $pattern, $handler] = $route;
-            $requiresAdmin = ($route[3] ?? null) === 'admin';
+            $guard = $route[3] ?? null;
 
             if ($method !== $request->method) continue;
 
@@ -28,8 +29,12 @@ class Router
 
             $request->params = $params;
 
-            if ($requiresAdmin && !AdminAuth::requireAdmin($request)) {
+            if ($guard === 'admin' && !AdminAuth::requireAdmin($request)) {
                 Response::error('Not authenticated.', 401);
+                return;
+            }
+            if ($guard === 'integration' && !IntegrationAuth::check($request)) {
+                Response::error('Invalid or missing API key.', 401);
                 return;
             }
 

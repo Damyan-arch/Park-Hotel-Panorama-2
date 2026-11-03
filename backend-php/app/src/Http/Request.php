@@ -29,6 +29,13 @@ class Request
         return $this->params[$name] ?? null;
     }
 
+    // A ?query=string value; null when missing or sent as an array (?a[]=1).
+    public function query(string $name): ?string
+    {
+        $value = $_GET[$name] ?? null;
+        return is_string($value) ? $value : null;
+    }
+
     public function header(string $name): ?string
     {
         $key = 'HTTP_' . str_replace('-', '_', strtoupper($name));

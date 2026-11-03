@@ -1,7 +1,7 @@
 <?php
 // Route table — mirrors Backend/server.js exactly (same paths, methods, and
 // which routes require admin auth), so the frontend contract doesn't change.
-// [METHOD, path pattern (relative to /api), [ControllerClass, 'method'], ?'admin']
+// [METHOD, path pattern (relative to /api), [ControllerClass, 'method'], ?'admin'|'integration']
 
 use App\Controllers\PublicController;
 use App\Controllers\ContactController;
@@ -15,6 +15,7 @@ use App\Controllers\AdminRoomsController;
 use App\Controllers\AdminGalleryController;
 use App\Controllers\AdminAmenitiesController;
 use App\Controllers\AdminEventsController;
+use App\Controllers\IntegrationController;
 
 return [
     ['GET', '/', [PublicController::class, 'index']],
@@ -37,6 +38,9 @@ return [
     ['GET', '/admin/bookings', [AdminLeadsController::class, 'bookings'], 'admin'],
     ['GET', '/admin/inquiries', [AdminLeadsController::class, 'inquiries'], 'admin'],
     ['PATCH', '/admin/bookings/{id}', [AdminLeadsController::class, 'updateBookingStatus'], 'admin'],
+    ['POST', '/admin/bookings/{id}/capture', [AdminLeadsController::class, 'captureDeposit'], 'admin'],
+    ['POST', '/admin/bookings/{id}/release', [AdminLeadsController::class, 'releaseDeposit'], 'admin'],
+    ['POST', '/admin/bookings/{id}/transfer', [AdminLeadsController::class, 'markTransfer'], 'admin'],
     ['PATCH', '/admin/inquiries/{id}', [AdminLeadsController::class, 'updateInquiryStatus'], 'admin'],
 
     ['POST', '/admin/upload', [AdminUploadController::class, 'upload'], 'admin'],
@@ -58,4 +62,10 @@ return [
     ['POST', '/admin/events', [AdminEventsController::class, 'create'], 'admin'],
     ['PUT', '/admin/events/{id}', [AdminEventsController::class, 'update'], 'admin'],
     ['DELETE', '/admin/events/{id}', [AdminEventsController::class, 'delete'], 'admin'],
+
+    // Mistral's Zamboo — API key, not an admin login. See INTEGRATION_API.md.
+    ['GET', '/integration/v1/bookings', [IntegrationController::class, 'bookings'], 'integration'],
+    ['GET', '/integration/v1/bookings/{id}', [IntegrationController::class, 'booking'], 'integration'],
+    ['PATCH', '/integration/v1/bookings/{id}', [IntegrationController::class, 'updateBookingStatus'], 'integration'],
+    ['GET', '/integration/v1/rooms', [IntegrationController::class, 'rooms'], 'integration'],
 ];

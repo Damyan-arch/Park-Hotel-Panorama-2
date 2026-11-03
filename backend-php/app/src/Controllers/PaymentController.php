@@ -5,22 +5,23 @@ namespace App\Controllers;
 use App\Http\Request;
 use App\Http\Response;
 use App\Repositories\RoomRepository;
+use App\Services\BankTransfer;
 use App\Services\PriceQuote;
 use App\Services\StripeService;
 
 class PaymentController
 {
-    // What the booking widget needs to decide whether to show the card field.
-    // The publishable key is public by design (it ships to every browser).
+    // Which deposit options the booking widget offers: `enabled` is the card
+    // (Stripe), `bankTransfer` the IBAN option. The publishable key is public by
+    // design (it ships to every browser); the bank details are only given out
+    // with a submitted request.
     public function config(Request $request): void
     {
-        if (!StripeService::isEnabled()) {
-            Response::json(['enabled' => false]);
-            return;
-        }
+        $card = StripeService::cardOffered();
         Response::json([
-            'enabled' => true,
-            'publishableKey' => StripeService::publishableKey(),
+            'enabled' => $card,
+            'publishableKey' => $card ? StripeService::publishableKey() : null,
+            'bankTransfer' => BankTransfer::isEnabled(),
             'depositPercent' => PriceQuote::DEPOSIT_PERCENT,
         ]);
     }
@@ -31,7 +32,7 @@ class PaymentController
     // the PaymentIntent id.
     public function createIntent(Request $request): void
     {
-        if (!StripeService::isEnabled()) {
+        if (!StripeService::cardOffered()) {
             Response::error('Online payment is not available.', 503);
             return;
         }
@@ -88,7 +89,7 @@ class PaymentController
     // (BookingController::complete).
     public function createCheckout(Request $request): void
     {
-        if (!StripeService::isEnabled()) {
+        if (!StripeService::cardOffered()) {
             Response::error('Online payment is not available.', 503);
             return;
         }
@@ -119,6 +120,12 @@ class PaymentController
         $room = (new RoomRepository())->find($roomId);
         if ($room === null) {
             Response::error('Selected room could not be found.');
+            return;
+        }
+
+        $guests = BookingController::occupancy($body, $room);
+        if ($guests === false) {
+            Response::error(BookingController::occupancyError($room));
             return;
         }
 
@@ -155,6 +162,7 @@ class PaymentController
                     'description' => 'Park Hotel Panorama booking deposit',
                     'metadata' => ['roomId' => $roomId],
                 ],
+                // Stripe metadata values are strings.
                 'metadata' => [
                     'roomId' => $roomId,
                     'roomName' => mb_substr($roomLabel, 0, 200),
@@ -163,7 +171,7 @@ class PaymentController
                     'name' => mb_substr($name, 0, 200),
                     'email' => $email,
                     'phone' => mb_substr($phone, 0, 60),
-                ],
+                ] + array_map('strval', $guests ?? []),
                 'success_url' => $base . '/?booking_session={CHECKOUT_SESSION_ID}#booking',
                 'cancel_url' => $base . '/#booking',
             ]);

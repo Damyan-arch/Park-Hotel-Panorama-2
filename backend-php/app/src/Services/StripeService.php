@@ -32,6 +32,18 @@ class StripeService
         return self::$secretKey !== '' && self::$publishableKey !== '';
     }
 
+    // Card payment for guests — the "Онлайн" option in the booking form. Off at
+    // the hotel's request until card payments go live: the option is hidden and
+    // the guest-facing payment endpoints refuse it, even with keys configured.
+    // The admin can still see and settle card deposits taken earlier. Set to
+    // true to offer it again.
+    public const OFFER_CARD_PAYMENTS = false;
+
+    public static function cardOffered(): bool
+    {
+        return self::OFFER_CARD_PAYMENTS && self::isEnabled();
+    }
+
     public static function publishableKey(): string
     {
         return self::$publishableKey;
@@ -62,6 +74,45 @@ class StripeService
     public static function retrieveIntent(string $id): array
     {
         return self::request('GET', '/payment_intents/' . rawurlencode($id), []);
+    }
+
+    // Takes the held deposit: the guest's card is charged, the money is paid out.
+    public static function captureIntent(string $id): array
+    {
+        return self::request('POST', '/payment_intents/' . rawurlencode($id) . '/capture', []);
+    }
+
+    // Drops the hold: the guest is never charged.
+    public static function cancelIntent(string $id): array
+    {
+        return self::request('POST', '/payment_intents/' . rawurlencode($id) . '/cancel', []);
+    }
+
+    // Link to a payment in the Stripe dashboard, in test or live mode to match
+    // the keys. With the account id it opens the right account even when the
+    // staff member's Stripe login has several.
+    public static function dashboardPaymentUrl(string $intentId, ?string $accountId = null): string
+    {
+        $test = str_starts_with(self::$secretKey, 'sk_test_') || str_starts_with(self::$secretKey, 'rk_test_');
+        return 'https://dashboard.stripe.com/'
+            . ($accountId ? rawurlencode($accountId) . '/' : '')
+            . ($test ? 'test/' : '')
+            . 'payments/' . rawurlencode($intentId);
+    }
+
+    // This Stripe account's id (acct_…), asked once per request.
+    private static ?string $accountId = null;
+    public static function accountId(): ?string
+    {
+        if (self::$accountId === null) {
+            try {
+                self::$accountId = (string) (self::request('GET', '/account', [])['id'] ?? '');
+            } catch (\Throwable $e) {
+                error_log('StripeService: ' . $e->getMessage());
+                self::$accountId = '';
+            }
+        }
+        return self::$accountId ?: null;
     }
 
     // Fallback for browsers that block Stripe's embedded card field: the guest

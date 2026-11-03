@@ -174,10 +174,11 @@ export function loadPayment() {
       try {
         const res = await fetch(`${API_BASE}/payment-config`);
         const data = await res.json();
-        if (!res.ok || !data.enabled) return (config = { enabled: false });
+        // enabled = card via Stripe; bankTransfer = the IBAN option
+        if (!res.ok) return (config = { enabled: false, bankTransfer: false });
         return (config = data);
       } catch {
-        return (config = { enabled: false });
+        return (config = { enabled: false, bankTransfer: false });
       }
     })();
   }
@@ -334,11 +335,11 @@ export async function holdDeposit({ roomId, checkIn, checkOut, name, email }) {
 // Fallback: send the guest to a Stripe-hosted page for the same 30% hold. The
 // server builds the session from its own price for the room and dates; the
 // booking is only created when they come back paid (see finishCheckoutReturn).
-export async function startCheckout({ roomId, roomName, checkIn, checkOut, name, email, phone }) {
+export async function startCheckout({ roomId, roomName, checkIn, checkOut, name, email, phone, adults, children, babies }) {
   const res = await fetch(`${API_BASE}/checkout-sessions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ roomId, roomName, checkIn, checkOut, name, email, phone, lang: state.lang })
+    body: JSON.stringify({ roomId, roomName, checkIn, checkOut, name, email, phone, adults, children, babies, lang: state.lang })
   });
   const data = await res.json();
   if (!res.ok || !data.url) throw new Error(data.error || "Could not start the payment.");

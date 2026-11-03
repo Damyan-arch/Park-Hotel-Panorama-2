@@ -124,6 +124,28 @@ Do this once, for real, before trusting a deploy:
 - Spot-check a few imported rooms/gallery items/events against the current
   live site's content.
 
+## Integration API (Mistral / Zamboo)
+
+`/api/integration/v1/*` lets an outside hotel system pull booking requests.
+The spec to send them is [INTEGRATION_API.md](INTEGRATION_API.md). It's off
+until a key is set. To turn it on:
+
+1. Run the migration once on the live DB:
+   `php database/apply-schema.php migration-2026-10-26-booking-updated-at.mysql.sql`
+2. Generate a key (`php -r "echo bin2hex(random_bytes(32));"`) and put it in
+   `config.local.php` under `integration.api_key`.
+3. **Check SiteGround's cache doesn't cache these responses.** It has cached
+   `GET /api/*` before. Here that would mean stale data, or one caller's
+   authenticated response served to someone without the key. Exclude
+   `/api/integration/*` (or all of `/api/*`) in Site Tools → Speed → Caching,
+   then verify:
+   - `curl -i https://parkhotelpanorama.com/api/integration/v1/rooms` (no
+     key) must return `401`, including right after a call made with the key.
+   - Two calls with the key a few seconds apart, after changing a booking
+     status in the admin, must show the change.
+4. Send the key to Mistral separately from the spec (not in the same email).
+   To revoke it, change or empty `integration.api_key`.
+
 ## Optional housekeeping
 
 `php database/cleanup-sessions.php` (wire to a nightly SiteGround Cron Job) prunes
